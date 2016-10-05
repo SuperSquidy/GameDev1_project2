@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>The Food is Alive</title>
+        <script src="phaser.js"></script>
+    </head>
+    <body>
+
+    <script type="text/javascript">
+
+    window.onload = function() {
+
+        var game = new Phaser.Game(1136, 640, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+        var start_swipe_point = new Phaser.Point(0,0);
+        var logo;
+        start_swipe = function (pointer) {
+            start_swipe_point = new Phaser.Point(pointer.x, pointer.y);
+        };
+
+        end_swipe = function (pointer) {
+            var swipe_length, cut_style, cut;
+            end_swipe_point = new Phaser.Point(pointer.x, pointer.y);
+            swipe_length = Phaser.Point.distance(end_swipe_point, start_swipe_point);
+            if (swipe_length >= 3) {
+                var swipe = new Phaser.Line(start_swipe_point.x, start_swipe_point.y, end_swipe_point.x, end_swipe_point.y);
+            }
+            console.log(swipe_length);
+            console.log(start_swipe_point);
+            console.log(end_swipe_point);
+            deltaY = end_swipe_point.y - start_swipe_point.y;
+            deltaX = end_swipe_point.x - start_swipe_point.x;
+            angleInDegrees = Math.atan2(deltaY, deltaX) * (180 / 3.14);
+            direction = ((angleInDegrees / 45));
+            if(direction < 0){
+                direction = 8 + direction;
+            }
+            console.log(direction);
+            //TODO: 
+        };
+
+        function preload () {
+
+            game.load.image('logo', 'phaser.png');
+
+        }
+
+        function create () {
+
+            logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
+            logo.anchor.setTo(0.5, 0.5);
+
+        }
+        function update() {
+            game.input.onDown.add(start_swipe, this);
+            game.input.onUp.add(end_swipe, this); 
+
+        }
+
+    };
+
+    </script>
+
+    </body>
+</html>
