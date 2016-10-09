@@ -21,10 +21,16 @@ function preload(){
     game.load.image('plate2', 'gameboy64x64.png');
 	//sprite for tomato
     game.load.image('tomato', 'food/foodTomato_static.png');
+    //sprite for dead tomato
+    game.load.image('tomato_dead', 'food/foodTomato_deadHighRes.png');
 	//sprite for steak
     game.load.image('steak', 'food/foodSteak_static.png');
+    //sprite for dead steak
+    game.load.image('steak_dead', 'food/foodSteak_deadHighRes.png');
 	//sprite for potato
     game.load.image('potato', 'food/foodPotato_static.png');
+    //sprite for dead potato
+    game.load.image('potato_dead', 'food/foodPotato_deadHighRes.png');
 }
 
 var topCollider;
@@ -76,32 +82,47 @@ check_collision = function () {
     for(j = 0; j < steaks.children.length; j++){        
         /*if(steaks.children[j].body.x < curGroup[0].x && steaks.children[j].body.right > curGroup[0].x && steaks.children[j].body.y < curGroup[0].y && steaks.children[j].body.bottom){*/
         if(isCutting(steaks.children[j].body, curGroup)){
-            if(angle > 150 && angle < 210 || angle > -180 && angle < -150){
-                steaks.children[j].kill();
+            steaks.children[j].loadTexture('steak_dead', 0);
+            steaks.children[j].body.velocity.x = 0;
+            game.physics.arcade.enable(steaks.children[j]);
+            steaks.children[j].moves = false;
+            steaks.children[j].inputEnabled = true;
+            steaks.children[j].input.enableDrag();
+            steaks.children[j].events.onDragStart.add(end_swipe, this);
+
                 //Kill code for those poor steaks
-            }
         }
     }
     for(j = 0; j < tomatoes.children.length; j++){
         if(isCutting(tomatoes.children[j].body, curGroup)){
-            if(angle > -30 && angle < 30){
-                tomatoes.children[j].kill();
+            tomatoes.children[j].loadTexture('tomato_dead', 0);
+            tomatoes.children[j].body.velocity.x = 0;
+            game.physics.arcade.enable(tomatoes.children[j]);
+            tomatoes.children[j].moves = false;
+            tomatoes.children[j].inputEnabled = true;
+            tomatoes.children[j].input.enableDrag();
+            tomatoes.children[j].events.onDragStart.add(end_swipe, this);
+            //Spawn a dead tomato in the same spot
                 //Kill code for those poor tomatoes
-            }
         }
     }
     for(j = 0; j < potatoes.children.length; j++){
         if(isCutting(potatoes.children[j].body, curGroup)){
-            if(angle > -120 && angle < -60){
-                potatoes.children[j].kill();
+            potatoes.children[j].loadTexture('potato_dead', 0);
+            potatoes.children[j].body.velocity.x = 0;
+            game.physics.arcade.enable(potatoes.children[j]);
+            potatoes.children[j].moves = false;
+            potatoes.children[j].inputEnabled = true;
+            potatoes.children[j].input.enableDrag();
+            potatoes.children[j].events.onDragStart.add(end_swipe, this);
                 //Kill code for those poor potatoes
-            }
         }
     }
 }
 function isCutting(body, curGroup)
 {
-    if(body.x < curGroup[0].x && body.right > curGroup[0].x && body.y < curGroup[0].y && body.bottom){
+    if(body.x < curGroup[0].x && body.right > curGroup[0].x && body.y < curGroup[0].y && body.bottom > curGroup[0].y && isDragging){
+    	console.log("We got a cut");
         return true;
     }
     return false
