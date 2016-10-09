@@ -14,7 +14,7 @@ var game = new Phaser.Game(1334,750, Phaser.AUTO, '',
 
 function preload(){
 	//background
-	game.load.image ('sky', 'sky.png');
+	game.load.image ('background', 'Proj2_Background.png');
     //sprite for dish1
 	game.load.image('plate1', 'mushroom2.png');
 	//sprite for dish2
@@ -78,6 +78,7 @@ function create()
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
     warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
 	
+	game.add.image(0,0,'background');
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	
 	//set invisible colliders
