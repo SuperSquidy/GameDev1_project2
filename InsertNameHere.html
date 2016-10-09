@@ -81,7 +81,6 @@ function create()
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
     warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
 	
-	game.add.image(0,0,'background');
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.add.image(0,0, 'background');
 	
@@ -392,19 +391,19 @@ function setDead(obj)
 	obj.body.velocity.y=0;	
 }
 function dodge(st){
-	
+	var inter=300;
 	if(st.alive === true)
 	{
 		//text2.text = "You clicked " + d + " times!";
 		if (Math.pow(Math.pow(st.body.x+st.width/2-game.input.activePointer.x,2)+Math.pow(st.body.y+st.height/2-game.input.activePointer.y,2),0.5)<=200){
 				if (game.input.activePointer.x>st.body.x+st.width/2){
-					st.body.velocity.x=-180*((st.body.x+st.width/2) / game.input.activePointer.x);
+					st.body.velocity.x=-inter*((st.body.x+st.width/2) / game.input.activePointer.x);
 				}
-				else st.body.velocity.x=180*1/((st.body.x+st.width/2) / game.input.activePointer.x);
+				else st.body.velocity.x=inter*1/((st.body.x+st.width/2) / game.input.activePointer.x);
 				if (game.input.activePointer.y>st.body.y+st.height/2){
-					st.body.velocity.y=-180*((st.body.y+st.width/2) / game.input.activePointer.y);
+					st.body.velocity.y=-inter*((st.body.y+st.width/2) / game.input.activePointer.y);
 				}
-				else st.body.velocity.y=180*1/((st.body.y+st.width/2) / game.input.activePointer.y);
+				else st.body.velocity.y=inter*1/((st.body.y+st.width/2) / game.input.activePointer.y);
 			}
 	}
 }
