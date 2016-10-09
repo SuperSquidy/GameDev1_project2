@@ -14,7 +14,7 @@ var game = new Phaser.Game(1334,750, Phaser.AUTO, '',
 
 function preload(){
 	//background
-	game.load.image ('sky', 'sky.png');
+	game.load.image ('background', 'Proj2_Background.png');
     //sprite for dish1
 	game.load.image('plate1', 'mushroom2.png');
 	//sprite for dish2
@@ -37,6 +37,8 @@ var atexst2;
 var text1;
 var text2;
 var text3;
+var crunchtime=false;
+var spawnY=165;
 //invisible colliders so that the vegitables can bounce
 var topCollider;
 var bottomCollider;
@@ -74,21 +76,23 @@ var timerText;
 var warningText;
 function create()
 {
+	
 	//time elapsed
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
     warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.add.image(0,0, 'background');
 	
 	//set invisible colliders
-	topCollider = game.add.sprite(-100,100, 'tomato');
+	topCollider = game.add.sprite(-100,135, 'tomato');
 	game.physics.enable(topCollider, Phaser.Physics.ARCADE);
-	topCollider.body.setSize(2034,5,0,0);
+	topCollider.body.setSize(3034,5,0,0);
 	topCollider.body.immovable = true;
 	topCollider.visible=false;
-	bottomCollider = game.add.sprite(-100,600, 'tomato');
+	bottomCollider = game.add.sprite(-100,460, 'tomato');
 	game.physics.enable(bottomCollider, Phaser.Physics.ARCADE);
-	bottomCollider.body.setSize(2034,5,0,0);
+	bottomCollider.body.setSize(3034,5,0,0);
 	bottomCollider.body.immovable = true;
 	bottomCollider.visible=false;	
 	
@@ -153,8 +157,8 @@ function create()
     {
 		//create the variable with the first dish sprite
 		var aWing = wings.create(0,0,'wing');
-	    var right = aWing.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	    var left = aWing.animations.add('right', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
+	    var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+	    var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 		aWing.animations.play('right', 15, true);
 		wings.addChild(aWing);
 		game.physics.arcade.enable(aWing);
@@ -440,6 +444,7 @@ function startTimer()
     if (Math.floor(Math.round(timeElapsed)/1000) >= 210) //display a 30 second warning at the 3:30 mark
     {
         warningText.text = '30 seconds left!'; 
+		crunchtime=true;
     }
     if (Math.floor(Math.round(timeElapsed)/1000) > 213)
     {
@@ -474,11 +479,17 @@ function spawnDishes()
         if (dish)
         {
 			//spawn the dishes offscreen so they can go and move into the screen
-            dish.reset(-200, 620);
+            dish.reset(-200, 500);
 			//with the velocity, speed of 130 = 10seconds... 43==30seconds or so
             dish.body.velocity.x = 43;
 			//spawn timer... 5000 = 5 sec.
-            dishTime = (game.time.now + 5000+Math.random()*4000)/*-aScore*/;
+			if(crunchtime===false)
+			{
+				dishTime = (game.time.now + 5000+Math.random()*4000)/*-aScore*/;
+			}
+			else{
+				dishTime = (game.time.now + 2000+Math.random()*4000)/*-aScore*/;
+			}
         }
     }
 	
@@ -531,7 +542,7 @@ function spawnTomato()
 		tomato = tomatoes.getFirstExists(false);
         if (tomato)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -544,8 +555,7 @@ function spawnTomato()
 				tomato.animations.play('left', 15, true);
 				}
 			
-			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				tomato.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -567,7 +577,7 @@ function spawnWing()
 		wing = wings.getFirstExists(false);
         if (wing)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -581,7 +591,7 @@ function spawnWing()
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				wing.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -603,7 +613,7 @@ function spawnPepper()
 		pepper = peppers.getFirstExists(false);
         if (pepper)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -617,7 +627,7 @@ function spawnPepper()
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				pepper.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -639,7 +649,7 @@ function spawnPotato()
 		potato = potatoes.getFirstExists(false);
         if (potato)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -651,7 +661,7 @@ function spawnPotato()
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				potato.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -673,7 +683,7 @@ function spawnSteak()
         if (steak)
         {
 			steak.alive=true;
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -687,7 +697,7 @@ function spawnSteak()
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				steak.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -804,8 +814,8 @@ function resetWing(item)
 		item.destroy();
 	}
 	var aWing = wings.create(0, 0, 'wing');
-	var right = aWing.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	var left = aWing.animations.add('right', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
+	var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+	var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 	aWing.animations.play('right', 15, true);
 	//don't spawn it yet
     aWing.exists = false;
@@ -918,6 +928,11 @@ function render() {
     game.debug.text('needs potato '+text1,32,82);
     game.debug.text('needs tomato '+text2,32,102);
     game.debug.text('needs steak '+text3,32,122);
+	
+	game.debug.body(bottomCollider);
+	game.debug.bodyInfo(bottomCollider,32,32);
+	game.debug.body(topCollider);
+	game.debug.bodyInfo(topCollider,32,32);
 
 }
 
