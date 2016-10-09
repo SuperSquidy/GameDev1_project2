@@ -16,9 +16,9 @@ function preload(){
 	//background
 	game.load.image ('sky', 'sky.png');
     //sprite for dish1
-	game.load.image('plate1', 'mushroom2.png');
+	game.load.image('plate1', 'plate.png');
 	//sprite for dish2
-    game.load.image('plate2', 'gameboy64x64.png');
+    game.load.image('plate2', 'plate2.png');
 	//sprite for tomato
     game.load.image('tomato', 'food/foodTomato_static.png');
     //sprite for dead tomato
@@ -89,6 +89,7 @@ check_collision = function () {
             steaks.children[j].inputEnabled = true;
             steaks.children[j].input.enableDrag();
             steaks.children[j].events.onDragStart.add(end_swipe, this);
+            steaks.children[j].events.onDragStop.add(isOnPot, steaks.children[j]);
 
                 //Kill code for those poor steaks
         }
@@ -126,6 +127,16 @@ function isCutting(body, curGroup)
         return true;
     }
     return false
+}
+function isOnPot(sprite){
+	for(j = 0; j < dishesG.children.length; j++){
+		if(sprite.body.x > dishesG.children[j].x && sprite.body.right < dishesG.children[j].x && dishesG.children[j].y < sprite.body.y && dishesG.children[j].y > sprite.body.bottom){
+			//Figure out how to assign a list of "needed" ingredients, and then add a compare to make sure the ingredient we are draggin belongs there
+			//Right now I don't know how we keep track of which food is which
+			dishesG.children[j].ingredients.push(sprite);
+		}
+	}
+	//check to see if it's on top of a dish, if it is add it to the dishes list of ingredients and move on with our life
 }
 function create()
 {
@@ -220,6 +231,7 @@ function create()
 		//create the variable with the first dish sprite
         var aDish = dishesG.create(0, 0, 'plate1');
 		aDish.name = 'dish1.' + i;
+		aDish.ingredients = [];
 		//don't spawn it yet
         aDish.exists = false;
         aDish.visible = false;
