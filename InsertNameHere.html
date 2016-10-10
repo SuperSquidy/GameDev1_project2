@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 
 <html>
 <head>
@@ -17,20 +16,28 @@ function preload(){
 	//background
 	game.load.image ('background', 'Proj2_Background.png');
     //sprite for dish1
-	game.load.image('plate1', 'mushroom2.png');
+	game.load.image('plate1', 'dish1plate.png');
 	//sprite for dish2
-    game.load.image('plate2', 'gameboy64x64.png');
+    game.load.image('plate2', 'dish2plate.png');
 	//sprite for tomato
     game.load.spritesheet('tomato', 'foodTomato_SpriteSheet.png', 70,70);
+    game.load.image('tomato2', 'foodTomato_static.png');
 	//sprite for steak
     game.load.spritesheet('steak', 'foodSteak_SpriteSheet.png',70,100);	
+    game.load.image('steak2', 'foodSteak_static.png');
 	//sprite for pepper
-	game.load.spritesheet('pepper', 'foodSteak_SpriteSheet.png',70,100);	///change aftere!!!!
+	game.load.spritesheet('pepper', 'foodPepper_SpriteSheet.png',50,80);
+    game.load.image('pepper2', 'foodPepper_static.png');
 	//sprite for wing
     game.load.spritesheet('wing', 'foodWing_SpriteSheet.png',55,60);
+    game.load.image('wing2', 'foodWing_static.png');
 	//sprite for potato
-	game.load.spritesheet('potato', 'foodSteak_SpriteSheet.png',70,100);//changeAFTER!!!
-    //font
+	game.load.spritesheet('potato', 'foodPotato_SpriteSheet.png',75,95);
+    game.load.image('potato2', 'foodPotato_static.png');
+	//sprite for celery
+	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,180);
+    game.load.image('celery2', 'foodCelery_static.png');
+	//font
     game.load.bitmapFont('desyrel', 'desyrel.png', 'desyrel.xml');
 }
 var atexst;
@@ -40,6 +47,7 @@ var text2;
 var text3;
 var crunchtime=false;
 var spawnY=165;
+var p=true;
 //invisible colliders so that the vegitables can bounce
 var topCollider;
 var bottomCollider;
@@ -57,6 +65,8 @@ var wingTime=0;
 var pepperTime=0;
 //delay time for potato;
 var potatoTime=0;
+//delay time for celery;
+var celeryTime=0;
 //simple boolean used to start game
 var inMenuScreen = true;
 //boolean that will activate once hasStarted = false;
@@ -68,7 +78,9 @@ var gamsStarText;
 
 //var for keeping when user starts game
 var delayTime = 0;
+var delayTime2 = 0;
 var timeElapsed = 0;
+var compDishes =0;
     
 //variable for temp text
 var timerText;
@@ -78,12 +90,12 @@ var warningText;
 function create()
 {
 	
+	game.add.image(0,0, 'background');
 	//time elapsed
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
     warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
-	game.add.image(0,0, 'background');
 	
 	//set invisible colliders
 	topCollider = game.add.sprite(-100,135, 'tomato');
@@ -112,6 +124,11 @@ function create()
     tomatoes.enableBody = true;
     tomatoes.physicsBodyType = Phaser.Physics.ARCADE;
 	
+	//group of tomatoes
+	celeries = game.add.group();
+    celeries.enableBody = true;
+    celeries.physicsBodyType = Phaser.Physics.ARCADE;
+	
 	//group of steak
 	steaks = game.add.group();
     steaks.enableBody = true;
@@ -136,7 +153,7 @@ function create()
 		var aTomato = tomatoes.create(0,0,'tomato');
 	    var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	    var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-		aTomato.animations.play('right', 15, true);
+	    var dead = aTomato.animations.add('dead', [16], 1, true);
 		tomatoes.addChild(aTomato);
 		game.physics.arcade.enable(aTomato);
 
@@ -228,6 +245,10 @@ function create()
     {
 		//create the variable with the first dish sprite
         var aPotato = potatoes.create(0, 0, 'potato');
+		
+	    var right = aPotato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+	    var left = aPotato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
+		aPotato.animations.play('right', 15, true);
 		//don't spawn it yet
         aPotato.exists = false;
         aPotato.name = 'potato';
@@ -239,6 +260,27 @@ function create()
         //allow toato to be dragged
         aPotato.inputEnabled = true; 
         aPotato.input.enableDrag(true);
+    }
+	//spawn all the celeries but they are no visible yet
+	for (var i = 0; i < 3; i++)
+    {
+		//create the variable with the first dish sprite
+        var aCelery = celeries.create(0, 0, 'celery');
+		
+	    var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
+	    var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 12, true);
+		aCelery.animations.play('right', 12, true);
+		//don't spawn it yet
+        aCelery.exists = false;
+        aCelery.name = 'potato';
+        aCelery.visible = false;
+		aCelery.body.bounce.set(1);
+		//activate world bounds with the object so that it can die when its complete
+        aCelery.checkWorldBounds = true;
+        aCelery.events.onOutOfBounds.add(resetPotato, this);
+        //allow toato to be dragged
+        aCelery.inputEnabled = true; 
+        aCelery.input.enableDrag(true);
     }
 
 	//spawn all the dishes but they are no visible yet
@@ -256,6 +298,15 @@ function create()
 		aDish.i1=true;
 		aDish.i2=true;
 		aDish.i3=true;
+		aDish.ings = game.add.group();
+		aDish.ings.enableBody = true;
+    	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+    	var icon = aDish.ings.create(0, 0, 'potato2');
+    	var icon = aDish.ings.create(0, 0, 'tomato2');
+    	var icon = aDish.ings.create(0, 0, 'steak2');
+		for(var j = 0; j < aDish.ings.children.length; j++){
+    		aDish.ings.children[j].visible = false;
+    	}	
         aDish.events.onOutOfBounds.add(resetDish1, this);
     }
 	//duplicated from above
@@ -270,6 +321,15 @@ function create()
 		aDish.i1=true;
 		aDish.i2=true;
 		aDish.i3=true;
+		aDish.ings = game.add.group();
+		aDish.ings.enableBody = true;
+    	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+		var icon = aDish.ings.create(0, 0, 'potato2');
+    	var icon = aDish.ings.create(0, 0, 'tomato2');
+    	var icon = aDish.ings.create(0, 0, 'steak2');
+		for(var j = 0; j < aDish.ings.children.length; j++){
+    		aDish.ings.children[j].visible = false;
+    	}	
         aDish.events.onOutOfBounds.add(resetDish2, this);
     }
 	//Menu
@@ -296,6 +356,7 @@ function update()
 		spawnDishes();
 		spawnTomato();
 		spawnPotato();
+		spawnCelery();
 		spawnPepper();
 		spawnWing();
 		spawnSteak();
@@ -307,6 +368,8 @@ function update()
 	game.physics.arcade.collide(tomatoes, bottomCollider);
 	game.physics.arcade.collide(potatoes, topCollider);
 	game.physics.arcade.collide(potatoes, bottomCollider);
+	game.physics.arcade.collide(celeries, topCollider);
+	game.physics.arcade.collide(celeries, bottomCollider);
 	game.physics.arcade.collide(peppers, topCollider);
 	game.physics.arcade.collide(peppers, bottomCollider);
 	game.physics.arcade.collide(wings, topCollider);
@@ -317,62 +380,136 @@ function update()
 	steaks.onChildInputDown.add(setDead, this);
 	potatoes.onChildInputDown.add(setDead, this);
 	tomatoes.onChildInputDown.add(setDead, this);
+	celeries.onChildInputDown.add(setDead, this);
 	peppers.onChildInputDown.add(setDead, this);
 	wings.onChildInputDown.add(setDead, this);
 	//make it so the items run away from the player
-	if (game.input.activePointer.isDown){
-		for (var i = 0, len = steaks.children.length; i < len; i++){
-			dodge(steaks.children[i]);
+	for (var i = 0, len = steaks.children.length; i < len; i++){
+		if(steaks.children[i].alive===false)
+		{
+			steaks.children[i].frame=16;
+		}else{
+			if (game.input.activePointer.isDown)
+			{
+				dodge(steaks.children[i]);
+			}
 			if(steaks.children[i].body.velocity.x>0)
 			{
 				steaks.children[i].animations.play('right');
 			}
-			else{
+			if(steaks.children[i].body.velocity.x<0)
+			{
 				steaks.children[i].animations.play('left');
 			}
+		}
+	
+	}
+	for (var i = 0, len = potatoes.children.length; i < len; i++){
+		if(potatoes.children[i].alive===false)
+		{
+			potatoes.children[i].frame=16;
+		}else{
+			if (game.input.activePointer.isDown)
+			{
+				dodge(potatoes.children[i]);
+			}
+			if(potatoes.children[i].body.velocity.x>0)
+			{
+				potatoes.children[i].animations.play('right');
+			}
+			if(potatoes.children[i].body.velocity.x<0)
+			{
+				potatoes.children[i].animations.play('left');
+			}
+		}
 		
+	}
+	for (var i = 0, len = celeries.children.length; i < len; i++){
+		if(celeries.children[i].alive===false)
+		{
+			celeries.children[i].frame=16;
+		}else{
+			if (game.input.activePointer.isDown)
+			{
+				dodge(celeries.children[i]);
+			}
+			if(celeries.children[i].body.velocity.x>0)
+			{
+				celeries.children[i].animations.play('right');
+			}
+			if(celeries.children[i].body.velocity.x<0)
+			{
+				celeries.children[i].animations.play('left');
+			}
 		}
-		for (var i = 0, len = potatoes.children.length; i < len; i++){
-			dodge(potatoes.children[i]);
-			
-		}
-		for (var i = 0, len = tomatoes.children.length; i < len; i++){
-			dodge(tomatoes.children[i]);
+		
+	}
+	for (var i = 0, len = tomatoes.children.length; i < len; i++)
+	{	
+		if(tomatoes.children[i].alive===false)
+		{
+			tomatoes.children[i].frame=16;
+		}else{
+			if (game.input.activePointer.isDown)
+			{
+				dodge(tomatoes.children[i]);
+			}
 			if(tomatoes.children[i].body.velocity.x>0)
 			{
 				tomatoes.children[i].animations.play('right');
 			}
-			else{
+			if(tomatoes.children[i].body.velocity.x<0)
+			{
 				tomatoes.children[i].animations.play('left');
 			}
 		}
-		for (var i = 0, len = peppers.children.length; i < len; i++){
-			dodge(peppers.children[i]);
+	}
+	for (var i = 0, len = peppers.children.length; i < len; i++){
+		if(peppers.children[i].alive===false)
+		{
+			peppers.children[i].frame=16;
+		}else{
+			if (game.input.activePointer.isDown)
+			{
+				dodge(peppers.children[i]);
+			}
 			if(peppers.children[i].body.velocity.x>0)
 			{
 				peppers.children[i].animations.play('right');
 			}
-			else{
+			if(peppers.children[i].body.velocity.x<0)
+			{
 				peppers.children[i].animations.play('left');
 			}
 		}
-		for (var i = 0, len = wings.children.length; i < len; i++){
-			dodge(wings.children[i]);
+	}
+	for (var i = 0, len = wings.children.length; i < len; i++){
+		if(wings.children[i].alive===false)
+		{
+			wings.children[i].frame=16;
+		}else{
+			if (game.input.activePointer.isDown)
+			{
+				dodge(wings.children[i]);
+			}
 			if(wings.children[i].body.velocity.x>0)
 			{
 				wings.children[i].animations.play('right');
 			}
-			else{
+			if(wings.children[i].body.velocity.x<0)
+			{
 				wings.children[i].animations.play('left');
 			}
 		}
-
 	}
+
+	
 	//TODO make the collisionand chekc for each individual one
 	for (var i = 0, len = dishesG.children.length; i < len; i++){
 		game.physics.arcade.overlap(steaks, dishesG.children[i], collision, null, this);
 		game.physics.arcade.overlap(tomatoes, dishesG.children[i], collision, null, this);
 		game.physics.arcade.overlap(potatoes, dishesG.children[i], collision, null, this);
+		game.physics.arcade.overlap(celeries, dishesG.children[i], collision, null, this);
 		game.physics.arcade.overlap(peppers, dishesG.children[i], collision, null, this);
 		game.physics.arcade.overlap(wings, dishesG.children[i], collision, null, this);
 	}
@@ -380,11 +517,24 @@ function update()
 		game.physics.arcade.overlap(steaks, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(tomatoes, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(potatoes, dishesG2.children[i], collision, null, this);
+		game.physics.arcade.overlap(celeries, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(wings, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(peppers, dishesG2.children[i], collision, null, this);
 	}
 }
 
+function setPause(obj)
+{
+	if(p)
+	{
+		timeElapsed=game.time.now-delayTime;
+		p=false;
+	}else{
+		delayTime=game.time.now-timeElapsed;
+		p=true;
+	}
+
+}
 function setDead(obj)
 {
 	obj.alive=false;
@@ -392,26 +542,35 @@ function setDead(obj)
 	obj.body.velocity.y=0;	
 }
 function dodge(st){
-	var inter=300;
+	
+	var aVar=0;
 	if(st.alive === true)
 	{
 		//text2.text = "You clicked " + d + " times!";
 		if (Math.pow(Math.pow(st.body.x+st.width/2-game.input.activePointer.x,2)+Math.pow(st.body.y+st.height/2-game.input.activePointer.y,2),0.5)<=200){
 				if (game.input.activePointer.x>st.body.x+st.width/2){
-					st.body.velocity.x=-inter*((st.body.x+st.width/2) / game.input.activePointer.x);
+					
+					if(st.body.x<0)
+					{
+						aVar=1;
+					}
+					else{
+						aVar = st.body.x;
+					}
+					st.body.velocity.x=-180*((aVar+st.width/2) / game.input.activePointer.x);
 				}
-				else st.body.velocity.x=inter*1/((st.body.x+st.width/2) / game.input.activePointer.x);
+				else st.body.velocity.x=180*1/((st.body.x+st.width/2) / game.input.activePointer.x);
 				if (game.input.activePointer.y>st.body.y+st.height/2){
-					st.body.velocity.y=-inter*((st.body.y+st.width/2) / game.input.activePointer.y);
+					st.body.velocity.y=-180*((st.body.y+st.width/2) / game.input.activePointer.y);
 				}
-				else st.body.velocity.y=inter*1/((st.body.y+st.width/2) / game.input.activePointer.y);
+				else st.body.velocity.y=180*1/((st.body.y+st.width/2) / game.input.activePointer.y);
 			}
 	}
 }
   
 function startTimer()
 {
-    timeElapsed = game.time.now - delayTime; //var to make sure that the timer starts at 0
+   if(p){ timeElapsed = game.time.now - delayTime;} //var to make sure that the timer starts at 0
     timerText.text = 'Time Elapsed: 0:0' + Math.floor(Math.round(timeElapsed)/1000); //display the timer
         
     if (Math.floor(Math.round(timeElapsed)/1000) >= 10) //making sure the seconds do not overflow
@@ -480,9 +639,13 @@ function spawnDishes()
         if (dish)
         {
 			//spawn the dishes offscreen so they can go and move into the screen
-            dish.reset(-200, 500);
+            dish.reset(-200, 520);
+			for(var j = 0; j < dish.ings.children.length; j++){
+            	dish.ings.children[j].reset(-210 + (j * 40), 560);
+            	dish.ings.children[j].body.velocity.x = 43 + compDishes * 2;
+            }
 			//with the velocity, speed of 130 = 10seconds... 43==30seconds or so
-            dish.body.velocity.x = 43;
+            dish.body.velocity.x = 43 + compDishes * 2;
 			//spawn timer... 5000 = 5 sec.
 			if(crunchtime===false)
 			{
@@ -491,961 +654,6 @@ function spawnDishes()
 			else{
 				dishTime = (game.time.now + 2000+Math.random()*4000)/*-aScore*/;
 			}
-        }
-    }
-	
-}
-function collision (obj1, obj2)
-{
-	atexst=obj1.name;
-	atexst2=obj2.name;
-	obj2.kill();
-	if(obj1.i1)
-	{
-		if(obj2.name==='potato')
-		{
-			obj1.i1=false;
-			obj1.h-=1;
-		}
-	}
-	if(obj1.i2)
-	{
-		if(obj2.name==='tomato')
-		{
-			obj1.i2=false;
-			obj1.h-=1;
-		}
-	}
-	if(obj1.i3)
-	{
-		if(obj2.name==='steak')
-		{
-			obj1.i3=false;
-			obj1.h-=1;
-		}
-	}
-    if(obj1.i1===false&&obj1.i2===false&&obj1.i3===false)
-	{
-		//if I killed the objected here it owul dmess wiht the otehr dishes so I just move it out of the screen.
-		obj1.reset(2000,800);
-	}
-	text1 = obj1.i1;
-	text2 = obj1.i2;
-	text3 = obj1.i3;
-}
-function spawnTomato()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > tomatoTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		tomato = tomatoes.getFirstExists(false);
-        if (tomato)
-        {
-			y = Math.floor(Math.random()*250)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				tomato.reset(-200,y);
-				tomato.body.velocity.x = 130+Math.random()*100;
-				tomato.animations.play('right', 15, true);
-			}else{
-				tomato.reset(1334,y);
-				tomato.body.velocity.x = (130+Math.random()*100)*(-1);
-				tomato.animations.play('left', 15, true);
-				}
-			
-			if(y>300)
-			{
-				tomato.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				tomato.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            tomatoTime = (game.time.now + Math.random()*10000);
-        }
-    }
-	
-}
-function spawnWing()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > wingTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		wing = wings.getFirstExists(false);
-        if (wing)
-        {
-			y = Math.floor(Math.random()*250)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				wing.reset(-200,y);
-				wing.body.velocity.x = 130+Math.random()*100;
-				wing.animations.play('right', 15, true);
-			}else{
-				wing.reset(1334,y);
-				wing.body.velocity.x = (130+Math.random()*100)*(-1);
-				wing.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				wing.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				wing.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            wingTime = (game.time.now + Math.random()*10000);
-        }
-    }
-	
-}
-function spawnPepper()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > pepperTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		pepper = peppers.getFirstExists(false);
-        if (pepper)
-        {
-			y = Math.floor(Math.random()*250)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				pepper.reset(-200,y);
-				pepper.body.velocity.x = 130+Math.random()*100;
-				pepper.animations.play('right', 15, true);
-			}else{
-				pepper.reset(1334,y);
-				pepper.body.velocity.x = (130+Math.random()*100)*(-1);
-				pepper.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				pepper.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				pepper.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            pepperTime = (game.time.now + Math.random()*10000);
-        }
-    }
-	
-}
-function spawnPotato()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > potatoTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		potato = potatoes.getFirstExists(false);
-        if (potato)
-        {
-			y = Math.floor(Math.random()*250)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				potato.reset(-200,y);
-				potato.body.velocity.x = 130+Math.random()*100;
-			}else{
-				potato.reset(1334,y);
-				potato.body.velocity.x = (130+Math.random()*100)*(-1);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				potato.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				potato.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            potatoTime = (game.time.now + Math.random()*10000);
-        }
-    }
-}
-function spawnSteak()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > steakTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		steak = steaks.getFirstExists(false);
-        if (steak)
-        {
-			steak.alive=true;
-			y = Math.floor(Math.random()*250)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				steak.reset(-200,y);
-				steak.body.velocity.x = 130+Math.random()*100;
-				steak.animations.play('right', 15, true);
-			}else{
-				steak.reset(1334,y);
-				steak.body.velocity.x = (130+Math.random()*100)*(-1);
-				steak.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				steak.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				steak.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            steakTime = (game.time.now + Math.random()*10000);
-        }
-    }
-}
-function resetDish1(dish)
-{
-	//picked 200 so that when it spawns it does not kill because dish spawns at x=-200
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(dish.x>200)
-	{
-		dish.destroy();
-	}
-	//create the variable with the first dish sprite
-	var aDish = dishesG.create(0, 0, 'plate1');
-	//don't spawn it yet
-	aDish.exists = false;
-	aDish.visible = false;
-	aDish.name = 'shroom';
-	//activate world bounds with the object so that it can die when its complete
-	aDish.checkWorldBounds = true;
-	aDish.h=3;
-	aDish.i1=true;
-	aDish.i2=true;
-	aDish.i3=true;
-	aDish.events.onOutOfBounds.add(resetDish1, this);
-}
-function resetDish2(dish)
-{
-	//picked 200 so that when it spawns it does not kill because dish spawns at x=-200
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(dish.x>200)
-	{
-		dish.destroy();
-	}
-	//create the variable with the first dish sprite
-	var aDish = dishesG2.create(0, 0, 'plate2');
-	//don't spawn it yet
-	aDish.exists = false;
-	aDish.visible = false;
-	aDish.name = 'game';
-	//activate world bounds with the object so that it can die when its complete
-	aDish.checkWorldBounds = true;
-	aDish.h=3;
-	aDish.i1=true;
-	aDish.i2=true;
-	aDish.i3=true;
-	aDish.events.onOutOfBounds.add(resetDish2, this);
-	
-}
-/*function resetItem(item)
-{
-	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(item.x>1354)
-	{
-		item.kill();
-	}
-	else if(item.x<-200)
-	{
-		item.kill();
-	}
-}*/
-function resetTomato(item)
-{
-	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(item.x>1554)
-	{
-		item.destroy();
-	}
-	else if(item.x<-400)
-	{
-		item.destroy();
-	}
-	var aTomato = tomatoes.create(0, 0, 'tomato');
-	var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-	aTomato.animations.play('right', 15, true);
-	//don't spawn it yet
-    aTomato.exists = false;
-	
-	aTomato.name = 'tomato';
-    aTomato.visible = false;
-	//activate world bounds with the object so that it can die when its complete
-    aTomato.checkWorldBounds = true;
-	aTomato.body.bounce.set(1);
-	//allow toato to be dragged
-    aTomato.inputEnabled = true; 
-    aTomato.input.enableDrag(true);
-    aTomato.events.onOutOfBounds.add(resetTomato, this);
-
-}
-function resetWing(item)
-{
-	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(item.x>1554)
-	{
-		item.destroy();
-	}
-	else if(item.x<-400)
-	{
-		item.destroy();
-	}
-	var aWing = wings.create(0, 0, 'wing');
-	var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-	aWing.animations.play('right', 15, true);
-	//don't spawn it yet
-    aWing.exists = false;
-	
-	aWing.name = 'tomato';
-    aWing.visible = false;
-	//activate world bounds with the object so that it can die when its complete
-    aWing.checkWorldBounds = true;
-	aWing.body.bounce.set(1);
-	//allow toato to be dragged
-    aWing.inputEnabled = true; 
-    aWing.input.enableDrag(true);
-    aWing.events.onOutOfBounds.add(resetWing, this);
-
-}
-function resetPepper(item)
-{
-	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(item.x>1554)
-	{
-		item.destroy();
-	}
-	else if(item.x<-400)
-	{
-		item.destroy();
-	}
-	var aPepper = peppers.create(0, 0, 'pepper');
-	var right = aPepper.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	var left = aPepper.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-	aPepper.animations.play('right', 15, true);
-	//don't spawn it yet
-    aPepper.exists = false;
-	
-	aPepper.name = 'tomato';
-    aPepper.visible = false;
-	//activate world bounds with the object so that it can die when its complete
-    aPepper.checkWorldBounds = true;
-	aPepper.body.bounce.set(1);
-	//allow toato to be dragged
-    aPepper.inputEnabled = true; 
-    aPepper.input.enableDrag(true);
-    aPepper.events.onOutOfBounds.add(resetPepper, this);
-
-}
-function resetSteak(item)
-{
-	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(item.x>1554)
-	{
-		item.destroy();
-	}
-	else if(item.x<-400)
-	{
-		item.destroy();
-	}
-	//create the variable with the first dish sprite
-	var aSteak = steaks.create(0, 0, 'steak');
-	
-	var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-	aSteak.animations.play('right', 15, true);
-	//don't spawn it yet
-	aSteak.exists = false;
-	
-	aSteak.name = 'steak';
-	aSteak.visible = false;
-	//activate world bounds with the object so that it can die when its complete
-	aSteak.checkWorldBounds = true;
-	aSteak.body.bounce.set(1);
-	aSteak.events.onOutOfBounds.add(resetSteak, this);
-	//allow toato to be dragged
-    aSteak.inputEnabled = true; 
-    aSteak.input.enableDrag(true);
-}
-function resetPotato(item)
-{
-	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
-	// and that is out of bounds
-	//add sound maybe if the player does not complete??
-	if(item.x>1354)
-	{
-		item.destroy();
-	}
-	else if(item.x<-200)
-	{
-		item.destroy();
-	}
-	var aPotato = potatoes.create(0, 0, 'potato');
-	//don't spawn it yet
-	aPotato.exists = false;
-	aPotato.name = 'potato';
-	aPotato.visible = false;
-	aPotato.body.bounce.set(1);
-	//activate world bounds with the object so that it can die when its complete
-	aPotato.checkWorldBounds = true;
-	aPotato.events.onOutOfBounds.add(resetPotato, this);
-	//allow toato to be dragged
-    aPotato.inputEnabled = true; 
-    aPotato.input.enableDrag(true);	
-
-}
-function render() {
-
-    game.debug.text('dish: '+atexst,32,62);
-    game.debug.text('item: '+atexst2,422,62);
-    game.debug.text('needs potato '+text1,32,82);
-    game.debug.text('needs tomato '+text2,32,102);
-    game.debug.text('needs steak '+text3,32,122);
-	
-	game.debug.body(bottomCollider);
-	game.debug.bodyInfo(bottomCollider,32,32);
-	game.debug.body(topCollider);
-	game.debug.bodyInfo(topCollider,32,32);
-
-}
-
-</script>
-</body>
-=======
-
-<html>
-<head>
-<title>InsertTitleHere</title>
-
-<script type="text/javascript" src="js/phaser.js"></script>
-</head>
-
-<body>
-
-<script type="text/javascript"> 
-var game = new Phaser.Game(1334,750, Phaser.AUTO, '', 
-{ preload: preload, create: create, update: update, render: render });
-
-function preload(){
-	//background
-	game.load.image ('sky', 'sky.png');
-    //sprite for dish1
-	game.load.image('plate1', 'dish1plate.png');
-	//sprite for dish2
-    game.load.image('plate2', 'dish2plate.png');
-    game.load.image('tom_ind', 'tom_IndImg.png');
-    game.load.image('pot_ind', 'mushroom2.png');
-    game.load.image('ste_ind', 'mushroom2.png');
-	//sprite for tomato
-    game.load.spritesheet('tomato', 'foodTomato_SpriteSheet.png', 70,70);
-	//sprite for steak
-    game.load.spritesheet('steak', 'foodSteak_SpriteSheet.png',70,100);	
-	//sprite for pepper
-	game.load.spritesheet('pepper', 'foodSteak_SpriteSheet.png',70,100);	///change aftere!!!!
-	//sprite for wing
-    game.load.spritesheet('wing', 'foodWing_SpriteSheet.png',55,60);
-	//sprite for potato
-	game.load.spritesheet('potato', 'foodSteak_SpriteSheet.png',70,100);//changeAFTER!!!
-    //font
-    game.load.bitmapFont('desyrel', 'desyrel.png', 'desyrel.xml');
-}
-var atexst;
-var atexst2;
-var text1;
-var text2;
-var text3;
-//invisible colliders so that the vegitables can bounce
-var topCollider;
-var bottomCollider;
-//this will be used for spawning
-var dish;
-//delay timer for spawning dish
-var dishTime = 0;
-//delay time for tomato;
-var tomatoTime=0;
-//delay time for steak;
-var steakTime=0;
-//delay time for wing;
-var wingTime=0;
-//delay time for pepper;
-var pepperTime=0;
-//delay time for potato;
-var potatoTime=0;
-//simple boolean used to start game
-var inMenuScreen = true;
-//boolean that will activate once hasStarted = false;
-var canSpawn = false;
-//interger used for whish dish to spawn
-var ranD;
-//variable that will change once the game has started
-var gamsStarText;
-
-//var for keeping when user starts game
-var delayTime = 0;
-var timeElapsed = 0;
-    
-//variable for temp text
-var timerText;
-    
-//variable for 30 second warning
-var warningText;
-function create()
-{
-	//time elapsed
-    timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
-    warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
-	
-	game.physics.startSystem(Phaser.Physics.ARCADE);
-	
-	//set invisible colliders
-	topCollider = game.add.sprite(-100,100, 'tomato');
-	game.physics.enable(topCollider, Phaser.Physics.ARCADE);
-	topCollider.body.setSize(2034,5,0,0);
-	topCollider.body.immovable = true;
-	topCollider.visible=false;
-	bottomCollider = game.add.sprite(-100,600, 'tomato');
-	game.physics.enable(bottomCollider, Phaser.Physics.ARCADE);
-	bottomCollider.body.setSize(2034,5,0,0);
-	bottomCollider.body.immovable = true;
-	bottomCollider.visible=false;	
-	
-	//first group of dishes
-	dishesG = game.add.group();
-    dishesG.enableBody = true;
-    dishesG.physicsBodyType = Phaser.Physics.ARCADE;
-	
-	//second group of dishes
-	dishesG2 = game.add.group();
-    dishesG2.enableBody = true;
-    dishesG2.physicsBodyType = Phaser.Physics.ARCADE;
-	
-	//group of tomatoes
-	tomatoes = game.add.group();
-    tomatoes.enableBody = true;
-    tomatoes.physicsBodyType = Phaser.Physics.ARCADE;
-	
-	//group of steak
-	steaks = game.add.group();
-    steaks.enableBody = true;
-    steaks.physicsBodyType = Phaser.Physics.ARCADE;
-	//group of potato
-	potatoes = game.add.group();
-    potatoes.enableBody = true;
-    potatoes.physicsBodyType = Phaser.Physics.ARCADE;
-	//group of peppper
-	peppers = game.add.group();
-    peppers.enableBody = true;
-    peppers.physicsBodyType = Phaser.Physics.ARCADE;
-	//group of wing
-	wings = game.add.group();
-    wings.enableBody = true;
-    wings.physicsBodyType = Phaser.Physics.ARCADE;
-	
-	//spawn all the tomatoes but they are no visible yet
-	for (var i = 0; i < 3; i++)
-    {
-		//create the variable with the first dish sprite
-		var aTomato = tomatoes.create(0,0,'tomato');
-	    var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	    var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-		aTomato.animations.play('right', 15, true);
-		tomatoes.addChild(aTomato);
-		game.physics.arcade.enable(aTomato);
-
-
-		//don't spawn it yet
-		aTomato.name = 'tomato';
-        aTomato.exists = false;
-        aTomato.visible = false;
-		//activate world bounds with the object so that it can die when its complete
-        aTomato.checkWorldBounds = true;
-		aTomato.body.bounce.set(1);
-		
-        //allow toato to be dragged
-        aTomato.inputEnabled = true; 
-        aTomato.input.enableDrag(true);
-        aTomato.events.onOutOfBounds.add(resetTomato, this);
-    }
-	for (var i = 0; i < 3; i++)
-    {
-		//create the variable with the first dish sprite
-		var aWing = wings.create(0,0,'wing');
-	    var right = aWing.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	    var left = aWing.animations.add('right', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-		aWing.animations.play('right', 15, true);
-		wings.addChild(aWing);
-		game.physics.arcade.enable(aWing);
-
-
-		//don't spawn it yet
-		aWing.name = 'wing';
-        aWing.exists = false;
-        aWing.visible = false;
-		//activate world bounds with the object so that it can die when its complete
-        aWing.checkWorldBounds = true;
-		aWing.body.bounce.set(1);
-		
-        //allow toato to be dragged
-        aWing.inputEnabled = true; 
-        aWing.input.enableDrag(true);
-        aWing.events.onOutOfBounds.add(resetWing, this);
-    }
-	for (var i = 0; i < 3; i++)
-    {
-		//create the variable with the first dish sprite
-		var aPepper = peppers.create(0,0,'pepper');
-	    var right = aPepper.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	    var left = aPepper.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-		aPepper.animations.play('right', 15, true);
-		peppers.addChild(aPepper);
-		game.physics.arcade.enable(aPepper);
-
-
-		//don't spawn it yet
-		aPepper.name = 'pepper';
-        aPepper.exists = false;
-        aPepper.visible = false;
-		//activate world bounds with the object so that it can die when its complete
-        aPepper.checkWorldBounds = true;
-		aPepper.body.bounce.set(1);
-		
-        //allow toato to be dragged
-        aPepper.inputEnabled = true; 
-        aPepper.input.enableDrag(true);
-        aPepper.events.onOutOfBounds.add(resetPepper, this);
-    }
-	//spawn all the steak but they are no visible yet
-	for (var i = 0; i < 3; i++)
-    {
-		//create the variable with the first dish sprite
-        var aSteak = steaks.create(0, 0, 'steak');
-	    var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	    var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-		aSteak.animations.play('right', 15, true);
-		//don't spawn it yet
-        aSteak.exists = false;
-        aSteak.name = 'steak';
-        aSteak.visible = false;
-		aSteak.alive = false;
-		//activate world bounds with the object so that it can die when its complete
-        aSteak.checkWorldBounds = true;
-		aSteak.body.bounce.set(1);
-        aSteak.events.onOutOfBounds.add(resetSteak, this);
-        //allow toato to be dragged
-        aSteak.inputEnabled = true; 
-        aSteak.input.enableDrag(true);
-    }
-	//spawn all the potato but they are no visible yet
-	for (var i = 0; i < 3; i++)
-    {
-		//create the variable with the first dish sprite
-        var aPotato = potatoes.create(0, 0, 'potato');
-		//don't spawn it yet
-        aPotato.exists = false;
-        aPotato.name = 'potato';
-        aPotato.visible = false;
-		aPotato.body.bounce.set(1);
-		//activate world bounds with the object so that it can die when its complete
-        aPotato.checkWorldBounds = true;
-        aPotato.events.onOutOfBounds.add(resetPotato, this);
-        //allow toato to be dragged
-        aPotato.inputEnabled = true; 
-        aPotato.input.enableDrag(true);
-    }
-
-	//spawn all the dishes but they are no visible yet
-	for (var i = 0; i < 5; i++)
-    {
-		//create the variable with the first dish sprite
-        var aDish = dishesG.create(0, 0, 'plate1');
-		//don't spawn it yet
-        aDish.exists = false;
-        aDish.visible = false;
-        aDish.name = 'shroom';
-		//activate world bounds with the object so that it can die when its complete
-        aDish.checkWorldBounds = true;
-		aDish.h=3;
-		aDish.i1=true;
-		aDish.i2=true;
-		aDish.i3=true;
-		aDish.ings = game.add.group();
-		aDish.ings.enableBody = true;
-    	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
-    	var icon = aDish.ings.create(0, 0, 'pot_ind');
-    	var icon = aDish.ings.create(0, 0, 'tom_ind');
-    	var icon = aDish.ings.create(0, 0, 'ste_ind');
-    	for(var j = 0; j < aDish.ings.children.length; j++){
-    		aDish.ings.children[j].visible = false;
-    	}
-        aDish.events.onOutOfBounds.add(resetDish1, this);
-    }
-	//duplicated from above
-	for (var i = 0; i < 5; i++)
-    {
-        var aDish = dishesG2.create(0, 0, 'plate2');
-        aDish.exists = false;
-		aDish.name = 'game';
-        aDish.visible = false;
-        aDish.checkWorldBounds = true;
-		aDish.h=3;
-		aDish.i1=true;
-		aDish.i2=true;
-		aDish.i3=true;
-		aDish.ings = game.add.group();
-		aDish.ings.enableBody = true;
-    	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
-    	var icon = aDish.ings.create(0, 0, 'pot_ind');
-    	var icon = aDish.ings.create(0, 0, 'tom_ind');
-    	var icon = aDish.ings.create(0, 0, 'ste_ind');
-    	for(var j = 0; j < aDish.ings.children.length; j++){
-    		aDish.ings.children[j].visible = false;
-    	}
-        aDish.events.onOutOfBounds.add(resetDish2, this);
-    }
-	//Menu
-	gameStartText = game.add.text(game.world.centerX, 500, 'Tap anywhere to start.', { font: "40px Arial", fill: "#ffffff", align: "center" });
-    gameStartText.anchor.setTo(.5, .5);
-	game.input.onDown.add(beginGame, this);
-}
-
-function beginGame()
-{
-	if(inMenuScreen)
-	{
-		gameStartText.visible=false;//get rid of menu
-		canSpawn=true;//set it so the veggies can spawn
-		inMenuScreen = false;
-		delayTime = game.time.now; //keep track of when the user starts the game
-	}
-}
-function update()
-{
-	// make a function that checks if the dishes are complete
-	if(canSpawn)
-	{
-		spawnDishes();
-		spawnTomato();
-		spawnPotato();
-		spawnPepper();
-		spawnWing();
-		spawnSteak();
-		startTimer();
-	}
-	game.physics.arcade.collide(steaks, topCollider);
-	game.physics.arcade.collide(steaks, bottomCollider);
-	game.physics.arcade.collide(tomatoes, topCollider);
-	game.physics.arcade.collide(tomatoes, bottomCollider);
-	game.physics.arcade.collide(potatoes, topCollider);
-	game.physics.arcade.collide(potatoes, bottomCollider);
-	game.physics.arcade.collide(peppers, topCollider);
-	game.physics.arcade.collide(peppers, bottomCollider);
-	game.physics.arcade.collide(wings, topCollider);
-	game.physics.arcade.collide(wings, bottomCollider);
-
-	//if the player hits the item then kill it..
-	//change this to if it is swiped correctly
-	steaks.onChildInputDown.add(setDead, this);
-	potatoes.onChildInputDown.add(setDead, this);
-	tomatoes.onChildInputDown.add(setDead, this);
-	peppers.onChildInputDown.add(setDead, this);
-	wings.onChildInputDown.add(setDead, this);
-	//make it so the items run away from the player
-	if (game.input.activePointer.isDown){
-		for (var i = 0, len = steaks.children.length; i < len; i++){
-			dodge(steaks.children[i]);
-			if(steaks.children[i].body.velocity.x>0)
-			{
-				steaks.children[i].animations.play('right');
-			}
-			else{
-				steaks.children[i].animations.play('left');
-			}
-		
-		}
-		for (var i = 0, len = potatoes.children.length; i < len; i++){
-			dodge(potatoes.children[i]);
-			
-		}
-		for (var i = 0, len = tomatoes.children.length; i < len; i++){
-			dodge(tomatoes.children[i]);
-			if(tomatoes.children[i].body.velocity.x>0)
-			{
-				tomatoes.children[i].animations.play('right');
-			}
-			else{
-				tomatoes.children[i].animations.play('left');
-			}
-		}
-		for (var i = 0, len = peppers.children.length; i < len; i++){
-			dodge(peppers.children[i]);
-			if(peppers.children[i].body.velocity.x>0)
-			{
-				peppers.children[i].animations.play('right');
-			}
-			else{
-				peppers.children[i].animations.play('left');
-			}
-		}
-		for (var i = 0, len = wings.children.length; i < len; i++){
-			dodge(wings.children[i]);
-			if(wings.children[i].body.velocity.x>0)
-			{
-				wings.children[i].animations.play('right');
-			}
-			else{
-				wings.children[i].animations.play('left');
-			}
-		}
-
-	}
-	//TODO make the collisionand chekc for each individual one
-	for (var i = 0, len = dishesG.children.length; i < len; i++){
-		game.physics.arcade.overlap(steaks, dishesG.children[i], collision, null, this);
-		game.physics.arcade.overlap(tomatoes, dishesG.children[i], collision, null, this);
-		game.physics.arcade.overlap(potatoes, dishesG.children[i], collision, null, this);
-		game.physics.arcade.overlap(peppers, dishesG.children[i], collision, null, this);
-		game.physics.arcade.overlap(wings, dishesG.children[i], collision, null, this);
-	}
-	for (var i = 0, len = dishesG2.children.length; i < len; i++){
-		game.physics.arcade.overlap(steaks, dishesG2.children[i], collision, null, this);
-		game.physics.arcade.overlap(tomatoes, dishesG2.children[i], collision, null, this);
-		game.physics.arcade.overlap(potatoes, dishesG2.children[i], collision, null, this);
-		game.physics.arcade.overlap(wings, dishesG2.children[i], collision, null, this);
-		game.physics.arcade.overlap(peppers, dishesG2.children[i], collision, null, this);
-	}
-}
-
-function setDead(obj)
-{
-	obj.alive=false;
-	obj.body.velocity.x=0;
-	obj.body.velocity.y=0;	
-}
-function dodge(st){
-	
-	if(st.alive === true)
-	{
-		//text2.text = "You clicked " + d + " times!";
-		if (Math.pow(Math.pow(st.body.x+st.width/2-game.input.activePointer.x,2)+Math.pow(st.body.y+st.height/2-game.input.activePointer.y,2),0.5)<=200){
-				if (game.input.activePointer.x>st.body.x+st.width/2){
-					st.body.velocity.x=-180*((st.body.x+st.width/2) / game.input.activePointer.x);
-				}
-				else st.body.velocity.x=180*1/((st.body.x+st.width/2) / game.input.activePointer.x);
-				if (game.input.activePointer.y>st.body.y+st.height/2){
-					st.body.velocity.y=-180*((st.body.y+st.width/2) / game.input.activePointer.y);
-				}
-				else st.body.velocity.y=180*1/((st.body.y+st.width/2) / game.input.activePointer.y);
-			}
-	}
-}
-  
-function startTimer()
-{
-    timeElapsed = game.time.now - delayTime; //var to make sure that the timer starts at 0
-    timerText.text = 'Time Elapsed: 0:0' + Math.floor(Math.round(timeElapsed)/1000); //display the timer
-        
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 10) //making sure the seconds do not overflow
-    {
-        timerText.text = 'Time Elapsed: 0:' + Math.floor(Math.round(timeElapsed)/1000); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 60)
-    {
-        timerText.text = 'Time Elapsed: 1:0' + (Math.floor(Math.round(timeElapsed)/1000) - 60); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 70)
-    {
-        timerText.text = 'Time Elapsed: 1:' + (Math.floor(Math.round(timeElapsed)/1000) - 60); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 120)
-    {
-        timerText.text = 'Time Elapsed: 2:0' + (Math.floor(Math.round(timeElapsed)/1000) - 120); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 130)
-    {
-        timerText.text = 'Time Elapsed: 2:' + (Math.floor(Math.round(timeElapsed)/1000) - 120); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 180)
-    {
-        timerText.text = 'Time Elapsed: 3:0' + (Math.floor(Math.round(timeElapsed)/1000) - 180); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 190)
-    {
-        timerText.text = 'Time Elapsed: 3:' + (Math.floor(Math.round(timeElapsed)/1000) - 180); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 210) //display a 30 second warning at the 3:30 mark
-    {
-        warningText.text = '30 seconds left!'; 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) > 213)
-    {
-        warningText.text = ''; 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 240) 
-    {
-        warningText.text = 'Game Over.'; 
-        timerText.text = '';
-        canSpawn=false;
-    }
-}
-function collisionHandler (obj1, obj2) {
-
-	obj1.body.velocity.y = obj1.body.velocity.y*-1;
-}
-//make a function for when the dishes are complete put sounds and such for it
-function spawnDishes()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > dishTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		if(ranD==1)
-		{
-			dish = dishesG.getFirstExists(false);
-		}
-		else{
-			dish = dishesG2.getFirstExists(false);
-		}
-        if (dish)
-        {
-			//spawn the dishes offscreen so they can go and move into the screen
-            dish.reset(-200, 620);
-            for(var j = 0; j < dish.ings.children.length; j++){
-            	dish.ings.children[j].reset(-200 + (j * 40), 640);
-            	dish.ings.children[j].body.velocity.x = 43;
-            }
-           	//with the velocity, speed of 130 = 10seconds... 43==30seconds or so
-            dish.body.velocity.x = 43;
-            //spawn timer... 5000 = 5 sec.
-            dishTime = (game.time.now + 5000+Math.random()*4000)/*-aScore*/;
         }
     }
 	
@@ -1486,6 +694,7 @@ function collision (obj1, obj2)
 	{
 		//if I killed the objected here it owul dmess wiht the otehr dishes so I just move it out of the screen.
 		obj1.reset(2000,800);
+		compDishes++;
 	}
 	text1 = obj1.i1;
 	text2 = obj1.i2;
@@ -1501,7 +710,7 @@ function spawnTomato()
 		tomato = tomatoes.getFirstExists(false);
         if (tomato)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -1514,8 +723,7 @@ function spawnTomato()
 				tomato.animations.play('left', 15, true);
 				}
 			
-			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				tomato.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -1537,7 +745,7 @@ function spawnWing()
 		wing = wings.getFirstExists(false);
         if (wing)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -1551,7 +759,7 @@ function spawnWing()
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				wing.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -1573,7 +781,7 @@ function spawnPepper()
 		pepper = peppers.getFirstExists(false);
         if (pepper)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -1587,7 +795,7 @@ function spawnPepper()
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				pepper.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -1609,19 +817,21 @@ function spawnPotato()
 		potato = potatoes.getFirstExists(false);
         if (potato)
         {
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
 				potato.reset(-200,y);
 				potato.body.velocity.x = 130+Math.random()*100;
+				potato.animations.play('right', 15, true);
 			}else{
 				potato.reset(1334,y);
 				potato.body.velocity.x = (130+Math.random()*100)*(-1);
+				potato.animations.play('left', 15, true);
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				potato.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -1629,6 +839,41 @@ function spawnPotato()
 			}
 			//spawn timer... 5000 = 5 sec.
             potatoTime = (game.time.now + Math.random()*10000);
+        }
+    }
+}
+function spawnCelery()
+{
+	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > celeryTime)
+    {
+		//random counter to spawn dishes
+		ranD = Math.floor(Math.random()*2);
+		celery = celeries.getFirstExists(false);
+        if (celery)
+        {
+			y = Math.floor(Math.random()*250)+spawnY;
+			if(ranD==1)
+			{
+				//spawn the dishes offscreen so they can go and move into the screen
+				celery.reset(-200,y);
+				celery.body.velocity.x = 130+Math.random()*100;
+				celery.animations.play('right', 15, true);
+			}else{
+				celery.reset(1334,y);
+				celery.body.velocity.x = (130+Math.random()*100)*(-1);
+				celery.animations.play('left', 15, true);
+				}
+			
+			ranD = Math.floor(Math.random()*2);
+			if(y>300)
+			{
+				celery.body.velocity.y = (Math.random()*100)*-1;
+			}else{
+				celery.body.velocity.y = (Math.random()*100);
+			}
+			//spawn timer... 5000 = 5 sec.
+            celeryTime = (game.time.now + Math.random()*10000);
         }
     }
 }
@@ -1643,7 +888,7 @@ function spawnSteak()
         if (steak)
         {
 			steak.alive=true;
-			y = Math.floor(Math.random()*400)+100;
+			y = Math.floor(Math.random()*250)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -1657,7 +902,7 @@ function spawnSteak()
 				}
 			
 			ranD = Math.floor(Math.random()*2);
-			if(ranD==1)
+			if(y>300)
 			{
 				steak.body.velocity.y = (Math.random()*100)*-1;
 			}else{
@@ -1689,6 +934,15 @@ function resetDish1(dish)
 	aDish.i1=true;
 	aDish.i2=true;
 	aDish.i3=true;
+	aDish.ings = game.add.group();
+	aDish.ings.enableBody = true;
+	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.ings.create(0, 0, 'potato2');
+	var icon = aDish.ings.create(0, 0, 'tomato2');
+	var icon = aDish.ings.create(0, 0, 'steak2');
+	for(var j = 0; j < aDish.ings.children.length; j++){
+		aDish.ings.children[j].visible = false;
+	}	
 	aDish.events.onOutOfBounds.add(resetDish1, this);
 }
 function resetDish2(dish)
@@ -1712,6 +966,16 @@ function resetDish2(dish)
 	aDish.i1=true;
 	aDish.i2=true;
 	aDish.i3=true;
+	aDish.ings = game.add.group();
+	aDish.ings.enableBody = true;
+	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.ings.create(0, 0, 'potato2');
+	var icon = aDish.ings.create(0, 0, 'tomato2');
+	var icon = aDish.ings.create(0, 0, 'steak2');
+	for(var j = 0; j < aDish.ings.children.length; j++){
+		aDish.ings.children[j].visible = false;
+	}	
+
 	aDish.events.onOutOfBounds.add(resetDish2, this);
 	
 }
@@ -1745,7 +1009,7 @@ function resetTomato(item)
 	var aTomato = tomatoes.create(0, 0, 'tomato');
 	var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
-	aTomato.animations.play('right', 15, true);
+    var dead = aTomato.animations.add('dead', [15], 1, true);
 	//don't spawn it yet
     aTomato.exists = false;
 	
@@ -1774,13 +1038,13 @@ function resetWing(item)
 		item.destroy();
 	}
 	var aWing = wings.create(0, 0, 'wing');
-	var right = aWing.animations.add('left', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	var left = aWing.animations.add('right', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
+	var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+	var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 	aWing.animations.play('right', 15, true);
 	//don't spawn it yet
     aWing.exists = false;
 	
-	aWing.name = 'tomato';
+	aWing.name = 'wing';
     aWing.visible = false;
 	//activate world bounds with the object so that it can die when its complete
     aWing.checkWorldBounds = true;
@@ -1811,7 +1075,7 @@ function resetPepper(item)
 	//don't spawn it yet
     aPepper.exists = false;
 	
-	aPepper.name = 'tomato';
+	aPepper.name = 'pepper';
     aPepper.visible = false;
 	//activate world bounds with the object so that it can die when its complete
     aPepper.checkWorldBounds = true;
@@ -1867,7 +1131,10 @@ function resetPotato(item)
 	{
 		item.destroy();
 	}
-	var aPotato = potatoes.create(0, 0, 'potato');
+	var aPotato = potatoes.create(0, 0, 'potato');	
+	var right = aPotato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+	var left = aPotato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
+	aPotato.animations.play('right', 15, true);
 	//don't spawn it yet
 	aPotato.exists = false;
 	aPotato.name = 'potato';
@@ -1881,17 +1148,52 @@ function resetPotato(item)
     aPotato.input.enableDrag(true);	
 
 }
+function resetCelery(item)
+{
+	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
+	// and that is out of bounds
+	//add sound maybe if the player does not complete??
+	if(item.x>1354)
+	{
+		item.destroy();
+	}
+	else if(item.x<-200)
+	{
+		item.destroy();
+	}
+	var aCelery = celeries.create(0, 0, 'celery');	
+	var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
+	var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 12, true);
+	aCelery.animations.play('right', 12, true);
+	//don't spawn it yet
+	aCelery.exists = false;
+	aCelery.name = 'potato';
+	aCelery.visible = false;
+	aCelery.body.bounce.set(1);
+	//activate world bounds with the object so that it can die when its complete
+	aCelery.checkWorldBounds = true;
+	aCelery.events.onOutOfBounds.add(resetCelery, this);
+	//allow toato to be dragged
+    aCelery.inputEnabled = true; 
+    aCelery.input.enableDrag(true);	
+
+}
 function render() {
 
-    game.debug.text('dish: '+atexst,32,62);
-    game.debug.text('item: '+atexst2,422,62);
-    game.debug.text('needs potato '+text1,32,82);
-    game.debug.text('needs tomato '+text2,32,102);
-    game.debug.text('needs steak '+text3,32,122);
+   // game.debug.text('dish: '+atexst,32,62);
+   // game.debug.text('item: '+atexst2,422,62);
+  //  game.debug.text('needs potato '+text1,32,82);
+   // game.debug.text('needs tomato '+text2,32,102);
+   // game.debug.text('needs steak '+text3,32,122);
+	
+	//game.debug.body(bottomCollider);
+	//game.debug.bodyInfo(bottomCollider,32,32);
+	//game.debug.bodyInfo(bottomCollider,32,32);
+	//game.debug.body(topCollider);
+//	game.debug.bodyInfo(topCollider,32,32);
 
 }
 
 </script>
 </body>
->>>>>>> 67002b57eab4f94dafb2437dc072cd04a4e31c02
 </html>
