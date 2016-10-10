@@ -21,6 +21,7 @@ rotten food. add a variable to food now to see if its rotten or not
 Add items to points
 fixx celery!!!
 Add animation
+sound
 */
 
 function preload(){
@@ -62,10 +63,11 @@ var atexst2;
 var text1;
 var text2;
 var text3;
-var num1=0;
+var num1;
 var crunchtime=false;
 var spawnY=165;
 var p=true;
+var isDrag=false;
 //invisible colliders so that the vegitables can bounce
 var topCollider;
 var bottomCollider;
@@ -280,23 +282,22 @@ function create()
 		}else{
 			var aSteak = steaks.create(0,0,'steakRot');
 			aSteak.isRot=true;
-		}
-	    var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
-	    var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
+		}	var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+		var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 		aSteak.animations.play('right', 15, true);
 		//don't spawn it yet
-        aSteak.exists = false;
-        aSteak.name = 'steak';
-        aSteak.visible = false;
-		aSteak.deadT=0;
-		aSteak.alive = false;
+		aSteak.exists = false;
+		
+		aSteak.name = 'steak';
+		aSteak.visible = false;
 		//activate world bounds with the object so that it can die when its complete
-        aSteak.checkWorldBounds = true;
+		aSteak.checkWorldBounds = true;
 		aSteak.body.bounce.set(1);
-        aSteak.events.onOutOfBounds.add(resetSteak, this);
-        //allow toato to be dragged
-        aSteak.inputEnabled = true; 
-        aSteak.input.enableDrag(true);
+		aSteak.deadT=0;
+		aSteak.events.onOutOfBounds.add(resetSteak, this);
+		//allow toato to be dragged
+		aSteak.inputEnabled = true; 
+		aSteak.input.enableDrag(true);
     }
 	//spawn all the potato but they are no visible yet
 	for (var i = 0; i < 3; i++)
@@ -479,6 +480,19 @@ function create()
             }
         }
     };
+	game.input.onDown.add(setDragT, this);
+	game.input.onUp.add(setDragF, this);
+}
+
+function setDragT()
+{
+	isDrag=true;
+	num1='down';
+}
+function setDragF()
+{
+	isDrag=false;
+	num1='up';
 }
 
 function beginGame()
@@ -519,6 +533,14 @@ function update()
 	game.physics.arcade.collide(peppers, bottomCollider);
 	game.physics.arcade.collide(wings, topCollider);
 	game.physics.arcade.collide(wings, bottomCollider);
+	
+
+	steaks.onChildInputOver.add(setDead, this);
+	potatoes.onChildInputOver.add(setDead, this);
+	tomatoes.onChildInputOver.add(setDead, this);
+	celeries.onChildInputOver.add(setDead, this);
+	peppers.onChildInputOver.add(setDead, this);
+	wings.onChildInputOver.add(setDead, this);
 
 	//if the player hits the item then kill it..
 	//change this to if it is swiped correctly
@@ -712,9 +734,12 @@ function setPause(obj)
 }
 function setDead(obj)
 {
-	obj.alive=false;
-	obj.body.velocity.x=0;
-	obj.body.velocity.y=0;	
+	if(isDrag)
+	{
+		obj.alive=false;
+		obj.body.velocity.x=0;
+		obj.body.velocity.y=0;	
+	}
 }
 function dodge(st){
 	
@@ -1410,7 +1435,7 @@ function render() {
 
    // game.debug.text('dish: '+atexst,32,62);
    // game.debug.text('item: '+atexst2,422,62);
-   //game.debug.text('timer'+num1,32,82);
+   //game.debug.text('text: '+isDrag,32,82);
    // game.debug.text('needs tomato '+text2,32,102);
    // game.debug.text('needs steak '+text3,32,122);
 	
