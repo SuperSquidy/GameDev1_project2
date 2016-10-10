@@ -13,6 +13,11 @@ var game = new Phaser.Game(1334,750, Phaser.AUTO, '',
 { preload: preload, create: create, update: update, render: render });
 
 function preload(){
+	//TODO:
+	//Increase speed of dishes over time
+	//implement all foods and icons for thereof
+	//Randomize dish templates
+	//Figure out what's wrong with the other sprite sheets?
 	//background
 	game.load.image ('sky', 'sky.png');
     //sprite for dish1
@@ -68,6 +73,7 @@ var gamsStarText;
 
 //var for keeping when user starts game
 var delayTime = 0;
+var compDishes = 0;
 var timeElapsed = 0;
     
 //variable for temp text
@@ -498,10 +504,10 @@ function spawnDishes()
             dish.reset(-200, 620);
             for(var j = 0; j < dish.ings.children.length; j++){
             	dish.ings.children[j].reset(-200 + (j * 40), 640);
-            	dish.ings.children[j].body.velocity.x = 43;
+            	dish.ings.children[j].body.velocity.x = 43 + compDishes * 2;
             }
            	//with the velocity, speed of 130 = 10seconds... 43==30seconds or so
-            dish.body.velocity.x = 43;
+            dish.body.velocity.x = 43 + compDishes * 2;
             //spawn timer... 5000 = 5 sec.
             dishTime = (game.time.now + 5000+Math.random()*4000)/*-aScore*/;
         }
@@ -544,6 +550,7 @@ function collision (obj1, obj2)
 	{
 		//if I killed the objected here it owul dmess wiht the otehr dishes so I just move it out of the screen.
 		obj1.reset(2000,800);
+		compDishes++;
 	}
 	text1 = obj1.i1;
 	text2 = obj1.i2;
@@ -747,6 +754,15 @@ function resetDish1(dish)
 	aDish.i1=true;
 	aDish.i2=true;
 	aDish.i3=true;
+	aDish.ings = game.add.group();
+	aDish.ings.enableBody = true;
+	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.ings.create(0, 0, 'pot_ind');
+	var icon = aDish.ings.create(0, 0, 'tom_ind');
+	var icon = aDish.ings.create(0, 0, 'ste_ind');
+	for(var j = 0; j < aDish.ings.children.length; j++){
+		aDish.ings.children[j].visible = false;
+	}
 	aDish.events.onOutOfBounds.add(resetDish1, this);
 }
 function resetDish2(dish)
@@ -770,6 +786,15 @@ function resetDish2(dish)
 	aDish.i1=true;
 	aDish.i2=true;
 	aDish.i3=true;
+	aDish.ings = game.add.group();
+	aDish.ings.enableBody = true;
+	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.ings.create(0, 0, 'pot_ind');
+	var icon = aDish.ings.create(0, 0, 'tom_ind');
+	var icon = aDish.ings.create(0, 0, 'ste_ind');
+	for(var j = 0; j < aDish.ings.children.length; j++){
+		aDish.ings.children[j].visible = false;
+	}
 	aDish.events.onOutOfBounds.add(resetDish2, this);
 	
 }
