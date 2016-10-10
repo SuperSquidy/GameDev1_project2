@@ -14,6 +14,7 @@ var game = new Phaser.Game(1334,750, Phaser.AUTO, '',
 
 function preload(){
 	//background
+	game.load.image ('background', 'Proj2_Background (1).png');
     //sprite for dish1
 	game.load.image('plate1', 'dish1plate.png');
 	//sprite for dish2
@@ -624,6 +625,7 @@ function collisionHandler (obj1, obj2) {
 function spawnDishes()
 {
 	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > (dishTime+500))
     {
 		//random counter to spawn dishes
 		ranD = Math.floor(Math.random()*2);
@@ -1184,6 +1186,8 @@ function render() {
    // game.debug.text('needs tomato '+text2,32,102);
    // game.debug.text('needs steak '+text3,32,122);
 	
+	game.debug.body(bottomCollider);
+	game.debug.bodyInfo(bottomCollider,32,32);
 	//game.debug.bodyInfo(bottomCollider,32,32);
 	//game.debug.body(topCollider);
 //	game.debug.bodyInfo(topCollider,32,32);
