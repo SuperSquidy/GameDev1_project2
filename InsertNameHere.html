@@ -12,6 +12,13 @@
 var game = new Phaser.Game(1334,750, Phaser.AUTO, '', 
 { preload: preload, create: create, update: update, render: render });
 
+/* TODO
+scoring system
+5second timer for dead stuff
+Add items to points
+Add animation
+*/
+
 function preload(){
 	//background
 	game.load.image ('background', 'Proj2_Background (1).png');
@@ -714,7 +721,7 @@ function spawnTomato()
 		tomato = tomatoes.getFirstExists(false);
         if (tomato)
         {
-			y = Math.floor(Math.random()*250)+spawnY;
+			y = Math.floor(Math.random()*150)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -749,7 +756,7 @@ function spawnWing()
 		wing = wings.getFirstExists(false);
         if (wing)
         {
-			y = Math.floor(Math.random()*250)+spawnY;
+			y = Math.floor(Math.random()*150)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -785,7 +792,7 @@ function spawnPepper()
 		pepper = peppers.getFirstExists(false);
         if (pepper)
         {
-			y = Math.floor(Math.random()*250)+spawnY;
+			y = Math.floor(Math.random()*150)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -821,7 +828,7 @@ function spawnPotato()
 		potato = potatoes.getFirstExists(false);
         if (potato)
         {
-			y = Math.floor(Math.random()*250)+spawnY;
+			y = Math.floor(Math.random()*150)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -856,7 +863,7 @@ function spawnCelery()
 		celery = celeries.getFirstExists(false);
         if (celery)
         {
-			y = Math.floor(Math.random()*250)+spawnY;
+			y = Math.floor(Math.random()*150)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -892,7 +899,7 @@ function spawnSteak()
         if (steak)
         {
 			steak.alive=true;
-			y = Math.floor(Math.random()*250)+spawnY;
+			y = Math.floor(Math.random()*150)+spawnY;
 			if(ranD==1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
@@ -1190,13 +1197,8 @@ function render() {
    // game.debug.text('needs tomato '+text2,32,102);
    // game.debug.text('needs steak '+text3,32,122);
 	
-<<<<<<< HEAD
-	game.debug.body(bottomCollider);
-	game.debug.bodyInfo(bottomCollider,32,32);
-=======
 	//game.debug.body(bottomCollider);
 	//game.debug.bodyInfo(bottomCollider,32,32);
->>>>>>> origin/master
 	//game.debug.bodyInfo(bottomCollider,32,32);
 	//game.debug.body(topCollider);
 //	game.debug.bodyInfo(topCollider,32,32);
