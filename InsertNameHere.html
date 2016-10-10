@@ -19,6 +19,7 @@ swipe
 reset deadT when we drag
 rotten food. add a variable to food now to see if its rotten or not
 Add items to points
+fixx celery!!!
 Add animation
 */
 
@@ -31,21 +32,27 @@ function preload(){
     game.load.image('plate2', 'dish2plate.png');
 	//sprite for tomato
     game.load.spritesheet('tomato', 'foodTomato_SpriteSheet.png', 70,70);
+    game.load.spritesheet('tomatoRot', 'foodTomato_SpriteSheet2.png', 70,70);
     game.load.image('tomato2', 'foodTomato_static.png');
 	//sprite for steak
     game.load.spritesheet('steak', 'foodSteak_SpriteSheet.png',70,100);	
+    game.load.spritesheet('steakRot', 'foodSteak_SpriteSheet.png',70,100);	//change
     game.load.image('steak2', 'foodSteak_static.png');
 	//sprite for pepper
 	game.load.spritesheet('pepper', 'foodPepper_SpriteSheet.png',50,80);
+	game.load.spritesheet('pepperRot', 'foodPepper_SpriteSheet.png',50,80);//change
     game.load.image('pepper2', 'foodPepper_static.png');
 	//sprite for wing
     game.load.spritesheet('wing', 'foodWing_SpriteSheet.png',55,60);
+    game.load.spritesheet('wingRot', 'foodWing_SpriteSheet.png',55,60);//change
     game.load.image('wing2', 'foodWing_static.png');
 	//sprite for potato
 	game.load.spritesheet('potato', 'foodPotato_SpriteSheet.png',75,95);
+	game.load.spritesheet('potatoRot', 'foodPotato_SpriteSheet.png',75,95);//change
     game.load.image('potato2', 'foodPotato_static.png');
 	//sprite for celery
 	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,180);
+	game.load.spritesheet('celeryRot', 'foodCelery_SpriteSheet.png',90,180);//change
     game.load.image('celery2', 'foodCelery_static.png');
 	//font
     game.load.bitmapFont('desyrel', 'desyrel.png', 'desyrel.xml');
@@ -164,7 +171,15 @@ function create()
 	for (var i = 0; i < 3; i++)
     {
 		//create the variable with the first dish sprite
-		var aTomato = tomatoes.create(0,0,'tomato');
+		ranD = Math.floor(Math.random()*2);
+		if(ranD===1)
+		{
+			var aTomato = tomatoes.create(0,0,'tomato');
+			aTomato.isRot=false;
+		}else{
+			var aTomato = tomatoes.create(0,0,'tomatoRot');
+			aTomato.isRot=true;
+		}
 	    var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	    var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 	    var dead = aTomato.animations.add('dead', [16], 1, true);
@@ -189,7 +204,15 @@ function create()
 	for (var i = 0; i < 3; i++)
     {
 		//create the variable with the first dish sprite
-		var aWing = wings.create(0,0,'wing');
+		ranD = Math.floor(Math.random()*2);
+		if(ranD===1)
+		{
+			var aWing = wings.create(0,0,'wing');
+			aWing.isRot=false;
+		}else{
+			var aWing = wings.create(0,0,'wingRot');
+			aWing.isRot=true;
+		}
 	    var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	    var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 		aWing.animations.play('right', 15, true);
@@ -214,7 +237,15 @@ function create()
 	for (var i = 0; i < 3; i++)
     {
 		//create the variable with the first dish sprite
-		var aPepper = peppers.create(0,0,'pepper');
+		ranD = Math.floor(Math.random()*2);
+		if(ranD===1)
+		{
+			var aPepper = peppers.create(0,0,'pepper');
+			aPepper.isRot=false;
+		}else{
+			var aPepper = peppers.create(0,0,'pepperRot');
+			aPepper.isRot=true;
+		}
 	    var right = aPepper.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	    var left = aPepper.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 		aPepper.animations.play('right', 15, true);
@@ -240,7 +271,16 @@ function create()
 	for (var i = 0; i < 3; i++)
     {
 		//create the variable with the first dish sprite
-        var aSteak = steaks.create(0, 0, 'steak');
+       
+		ranD = Math.floor(Math.random()*2);
+		if(ranD===1)
+		{
+			var aSteak = steaks.create(0, 0, 'steak');
+			aSteak.isRot=false;
+		}else{
+			var aSteak = steaks.create(0,0,'steakRot');
+			aSteak.isRot=true;
+		}
 	    var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	    var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 		aSteak.animations.play('right', 15, true);
@@ -262,8 +302,15 @@ function create()
 	for (var i = 0; i < 3; i++)
     {
 		//create the variable with the first dish sprite
-        var aPotato = potatoes.create(0, 0, 'potato');
-		
+		ranD = Math.floor(Math.random()*2);
+		if(ranD===1)
+		{
+			var aPotato = potatoes.create(0, 0, 'potato');
+			aPotato.isRot=false;
+		}else{
+			var aPotato = potatoes.create(0,0,'potatoRot');
+			aPotato.isRot=true;
+		}
 	    var right = aPotato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	    var left = aPotato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 		aPotato.animations.play('right', 15, true);
@@ -284,8 +331,15 @@ function create()
 	for (var i = 0; i < 3; i++)
     {
 		//create the variable with the first dish sprite
-        var aCelery = celeries.create(0, 0, 'celery');
-		
+        ranD = Math.floor(Math.random()*2);
+		if(ranD===1)
+		{
+			var aCelery = celeries.create(0, 0, 'celery');
+			aCelery.isRot=false;
+		}else{
+			var aCelery = celeries.create(0,0,'celeryRot');
+			aCelery.isRot=true;
+		}
 	    var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
 	    var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 12, true);
 		aCelery.animations.play('right', 12, true);
@@ -1128,7 +1182,15 @@ function resetTomato(item)
 	{
 		item.destroy();
 	}
-	var aTomato = tomatoes.create(0, 0, 'tomato');
+	ranD = Math.floor(Math.random()*2);
+	if(ranD===1)
+	{
+		var aTomato = tomatoes.create(0,0,'tomato');
+		aTomato.isRot=false;
+	}else{
+		var aTomato = tomatoes.create(0,0,'tomatoRot');
+		aTomato.isRot=true;
+	}
 	var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
     var dead = aTomato.animations.add('dead', [15], 1, true);
@@ -1159,8 +1221,16 @@ function resetWing(item)
 	else if(item.x<-400)
 	{
 		item.destroy();
+	}	
+	ranD = Math.floor(Math.random()*2);
+	if(ranD===1)
+	{
+		var aWing = wings.create(0,0,'wing');
+		aWing.isRot=false;
+	}else{
+		var aWing = wings.create(0,0,'wingRot');
+		aWing.isRot=true;
 	}
-	var aWing = wings.create(0, 0, 'wing');
 	var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 	aWing.animations.play('right', 15, true);
@@ -1192,7 +1262,15 @@ function resetPepper(item)
 	{
 		item.destroy();
 	}
-	var aPepper = peppers.create(0, 0, 'pepper');
+	ranD = Math.floor(Math.random()*2);
+	if(ranD===1)
+	{
+		var aPepper = peppers.create(0,0,'pepper');
+		aPepper.isRot=false;
+	}else{
+		var aPepper = peppers.create(0,0,'pepperRot');
+		aPepper.isRot=true;
+	}
 	var right = aPepper.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aPepper.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 	aPepper.animations.play('right', 15, true);
@@ -1225,9 +1303,15 @@ function resetSteak(item)
 		item.destroy();
 	}
 	//create the variable with the first dish sprite
-	var aSteak = steaks.create(0, 0, 'steak');
-	
-	var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+	ranD = Math.floor(Math.random()*2);
+	if(ranD===1)
+	{
+		var aSteak = steaks.create(0, 0, 'steak');
+		aSteak.isRot=false;
+	}else{
+		var aSteak = steaks.create(0,0,'steakRot');
+		aSteak.isRot=true;
+	}	var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 	aSteak.animations.play('right', 15, true);
 	//don't spawn it yet
@@ -1257,7 +1341,15 @@ function resetPotato(item)
 	{
 		item.destroy();
 	}
-	var aPotato = potatoes.create(0, 0, 'potato');	
+	ranD = Math.floor(Math.random()*2);
+	if(ranD===1)
+	{
+		var aPotato = potatoes.create(0, 0, 'potato');
+		aPotato.isRot=false;
+	}else{
+		var aPotato = potatoes.create(0,0,'potatoRot');
+		aPotato.isRot=true;
+	}
 	var right = aPotato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aPotato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
 	aPotato.animations.play('right', 15, true);
@@ -1288,7 +1380,15 @@ function resetCelery(item)
 	{
 		item.destroy();
 	}
-	var aCelery = celeries.create(0, 0, 'celery');	
+	ranD = Math.floor(Math.random()*2);
+	if(ranD===1)
+	{
+		var aCelery = celeries.create(0, 0, 'celery');
+		aCelery.isRot=false;
+	}else{
+		var aCelery = celeries.create(0,0,'celeryRot');
+		aCelery.isRot=true;
+	}	
 	var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
 	var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 12, true);
 	aCelery.animations.play('right', 12, true);
