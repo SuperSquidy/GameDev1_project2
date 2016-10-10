@@ -15,6 +15,9 @@ var game = new Phaser.Game(1334,750, Phaser.AUTO, '',
 /* TODO
 scoring system
 5second timer for dead stuff
+swipe 
+reset deadT when we drag
+rotten food. add a variable to food now to see if its rotten or not
 Add items to points
 Add animation
 */
@@ -52,6 +55,7 @@ var atexst2;
 var text1;
 var text2;
 var text3;
+var num1=0;
 var crunchtime=false;
 var spawnY=165;
 var p=true;
@@ -82,21 +86,24 @@ var canSpawn = false;
 var ranD;
 //variable that will change once the game has started
 var gamsStarText;
-
 //var for keeping when user starts game
 var delayTime = 0;
-var delayTime2 = 0;
 var timeElapsed = 0;
 var compDishes =0;
-    
 //variable for temp text
 var timerText;
-    
+var MenuDelayTime=0;
+var PauseDelayTime=0;
+var w=800;
+var h=600;
+var stop=true;
+var p=0;
+var stateText;
 //variable for 30 second warning
 var warningText;
 function create()
 {
-	
+	stateText=game.add.bitmapText(600,10,'desyrel','',16);
 	game.add.image(0,0, 'background');
 	//time elapsed
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
@@ -105,7 +112,7 @@ function create()
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 	
 	//set invisible colliders
-	topCollider = game.add.sprite(-100,135, 'tomato');
+	topCollider = game.add.sprite(-100,80, 'tomato');
 	game.physics.enable(topCollider, Phaser.Physics.ARCADE);
 	topCollider.body.setSize(3034,5,0,0);
 	topCollider.body.immovable = true;
@@ -169,6 +176,7 @@ function create()
 		aTomato.name = 'tomato';
         aTomato.exists = false;
         aTomato.visible = false;
+		aTomato.deadT=0;
 		//activate world bounds with the object so that it can die when its complete
         aTomato.checkWorldBounds = true;
 		aTomato.body.bounce.set(1);
@@ -193,6 +201,7 @@ function create()
 		aWing.name = 'wing';
         aWing.exists = false;
         aWing.visible = false;
+		aWing.deadT=0;
 		//activate world bounds with the object so that it can die when its complete
         aWing.checkWorldBounds = true;
 		aWing.body.bounce.set(1);
@@ -217,6 +226,7 @@ function create()
 		aPepper.name = 'pepper';
         aPepper.exists = false;
         aPepper.visible = false;
+		aPepper.deadT=0;
 		//activate world bounds with the object so that it can die when its complete
         aPepper.checkWorldBounds = true;
 		aPepper.body.bounce.set(1);
@@ -238,6 +248,7 @@ function create()
         aSteak.exists = false;
         aSteak.name = 'steak';
         aSteak.visible = false;
+		aSteak.deadT=0;
 		aSteak.alive = false;
 		//activate world bounds with the object so that it can die when its complete
         aSteak.checkWorldBounds = true;
@@ -259,6 +270,7 @@ function create()
 		//don't spawn it yet
         aPotato.exists = false;
         aPotato.name = 'potato';
+		aPotato.deadT=0;
         aPotato.visible = false;
 		aPotato.body.bounce.set(1);
 		//activate world bounds with the object so that it can die when its complete
@@ -280,6 +292,7 @@ function create()
 		//don't spawn it yet
         aCelery.exists = false;
         aCelery.name = 'potato';
+		aCelery.deadT=0;
         aCelery.visible = false;
 		aCelery.body.bounce.set(1);
 		//activate world bounds with the object so that it can die when its complete
@@ -342,7 +355,76 @@ function create()
 	//Menu
 	gameStartText = game.add.text(game.world.centerX, 500, 'Tap anywhere to start.', { font: "40px Arial", fill: "#ffffff", align: "center" });
     gameStartText.anchor.setTo(.5, .5);
+    stateText=game.add.bitmapText(600,10,'desyrel','',16);
 	game.input.onDown.add(beginGame, this);
+    
+    
+    //label for restarting the game
+    //stateText = game.add.bitmapText(1200, 700, 'desyrel', '', 32);
+    
+    // Create a label to use as a button
+
+    timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
+    warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
+    pause_label = game.add.bitmapText(1250, 10, 'desyrel', '', 32);
+    
+		
+	
+    pause_label.inputEnabled = true;
+    pause_label.events.onInputUp.add(function () {
+        // When the pause button is pressed, we pause the game
+        game.paused = true;
+        
+        if (stop==true){
+        PauseDelayTime = game.time.now; stop=false; }
+        
+        // Then add the menu
+        
+
+        // And a label to 
+        choiseLabel = game.add.bitmapText(660, h-150, 'desyrel', '- Slice ingredients to kill them -\n- Drag them to the correct dish -\n- Beat the dinner rush in 4 mins! -', 50 );
+        choiseLabel.anchor.setTo(0.5, 0.5);
+        
+        
+        });
+    stateText.inputEnabled=true;
+    stateText.events.onInputUp.add(function(){
+        	window.location.reload(true);
+    });
+
+    // Add a input listener that can help us return from being paused
+    game.input.onDown.add(unpause, self);
+
+    // And finally the method that handels the pause menu
+    function unpause(event){
+        
+        
+        // Only act if paused
+        if(game.paused){
+            // Calculate the corners of the menu
+            var x1 = w/2 - 270/2, x2 = w/2 + 270/2,
+                y1 = h/2 - 180/2, y2 = h/2 + 180/2;
+            
+            
+            
+            // Check if the click was inside the menu
+            if(event.x > x1 && event.x < x2 && event.y > y1 && event.y < y2 ){
+                
+                
+            }
+            else{
+                // Remove the menu and the label
+                //menu.destroy();
+                choiseLabel.destroy();
+                //stateText.text = '';
+                // Unpause the game
+                game.paused = false;
+                p += game.time.now - PauseDelayTime;
+                //PauseDelayTime=game.time.now;
+                stop=true;
+            }
+        }
+    };
 }
 
 function beginGame()
@@ -353,10 +435,12 @@ function beginGame()
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
 		delayTime = game.time.now; //keep track of when the user starts the game
+		pause_label.text='Pause';
 	}
 }
 function update()
 {
+	
 	// make a function that checks if the dishes are complete
 	if(canSpawn)
 	{
@@ -395,6 +479,11 @@ function update()
 		if(steaks.children[i].alive===false)
 		{
 			steaks.children[i].frame=16;
+			steaks.children[i].deadT++;
+			if(steaks.children[i].deadT>=300)
+			{
+				steaks.children[i].body.x=4000;
+			}
 		}else{
 			if (game.input.activePointer.isDown)
 			{
@@ -415,6 +504,11 @@ function update()
 		if(potatoes.children[i].alive===false)
 		{
 			potatoes.children[i].frame=16;
+			potatoes.children[i].deadT++;
+			if(potatoes.children[i].deadT>=300)
+			{
+				potatoes.children[i].body.x=4000;
+			}
 		}else{
 			if (game.input.activePointer.isDown)
 			{
@@ -435,6 +529,11 @@ function update()
 		if(celeries.children[i].alive===false)
 		{
 			celeries.children[i].frame=16;
+			celeries.children[i].deadT++;
+			if(celeries.children[i].deadT>=300)
+			{
+				celeries.children[i].body.x=4000;
+			}
 		}else{
 			if (game.input.activePointer.isDown)
 			{
@@ -456,6 +555,11 @@ function update()
 		if(tomatoes.children[i].alive===false)
 		{
 			tomatoes.children[i].frame=16;
+			tomatoes.children[i].deadT++;
+			if(tomatoes.children[i].deadT>=300)
+			{
+				tomatoes.children[i].body.x=4000;
+			}
 		}else{
 			if (game.input.activePointer.isDown)
 			{
@@ -475,6 +579,11 @@ function update()
 		if(peppers.children[i].alive===false)
 		{
 			peppers.children[i].frame=16;
+			peppers.children[i].deadT++;
+			if(peppers.children[i].deadT>=300)
+			{
+				peppers.children[i].body.x=4000;
+			}
 		}else{
 			if (game.input.activePointer.isDown)
 			{
@@ -494,6 +603,11 @@ function update()
 		if(wings.children[i].alive===false)
 		{
 			wings.children[i].frame=16;
+			wings.children[i].deadT++;
+			if(wings.children[i].deadT>=300)
+			{
+				wings.children[i].body.x=4000;
+			}
 		}else{
 			if (game.input.activePointer.isDown)
 			{
@@ -577,7 +691,8 @@ function dodge(st){
   
 function startTimer()
 {
-   if(p){ timeElapsed = game.time.now - delayTime;} //var to make sure that the timer starts at 0
+	stateText.text='RESTART';
+	timeElapsed=game.time.now - MenuDelayTime-p;
     timerText.text = 'Time Elapsed: 0:0' + Math.floor(Math.round(timeElapsed)/1000); //display the timer
         
     if (Math.floor(Math.round(timeElapsed)/1000) >= 10) //making sure the seconds do not overflow
@@ -632,11 +747,7 @@ function collisionHandler (obj1, obj2) {
 function spawnDishes()
 {
 	//timer so that the dishes spawn with enough space on them
-<<<<<<< HEAD
 	if (game.time.now > (dishTime+500))
-=======
-	if (game.time.now > dishTime)
->>>>>>> origin/master
     {
 		//random counter to spawn dishes
 		ranD = Math.floor(Math.random()*2);
@@ -1026,6 +1137,7 @@ function resetTomato(item)
 	
 	aTomato.name = 'tomato';
     aTomato.visible = false;
+	aTomato.deadT = 0;
 	//activate world bounds with the object so that it can die when its complete
     aTomato.checkWorldBounds = true;
 	aTomato.body.bounce.set(1);
@@ -1060,6 +1172,7 @@ function resetWing(item)
 	//activate world bounds with the object so that it can die when its complete
     aWing.checkWorldBounds = true;
 	aWing.body.bounce.set(1);
+	aWing.deadT=0;
 	//allow toato to be dragged
     aWing.inputEnabled = true; 
     aWing.input.enableDrag(true);
@@ -1091,6 +1204,7 @@ function resetPepper(item)
 	//activate world bounds with the object so that it can die when its complete
     aPepper.checkWorldBounds = true;
 	aPepper.body.bounce.set(1);
+	aPepper.deadT=0;
 	//allow toato to be dragged
     aPepper.inputEnabled = true; 
     aPepper.input.enableDrag(true);
@@ -1124,6 +1238,7 @@ function resetSteak(item)
 	//activate world bounds with the object so that it can die when its complete
 	aSteak.checkWorldBounds = true;
 	aSteak.body.bounce.set(1);
+	aSteak.deadT=0;
 	aSteak.events.onOutOfBounds.add(resetSteak, this);
 	//allow toato to be dragged
     aSteak.inputEnabled = true; 
@@ -1150,6 +1265,7 @@ function resetPotato(item)
 	aPotato.exists = false;
 	aPotato.name = 'potato';
 	aPotato.visible = false;
+	aPotato.deadT=0;
 	aPotato.body.bounce.set(1);
 	//activate world bounds with the object so that it can die when its complete
 	aPotato.checkWorldBounds = true;
@@ -1180,6 +1296,7 @@ function resetCelery(item)
 	aCelery.exists = false;
 	aCelery.name = 'potato';
 	aCelery.visible = false;
+	aCelery.deadT=0;
 	aCelery.body.bounce.set(1);
 	//activate world bounds with the object so that it can die when its complete
 	aCelery.checkWorldBounds = true;
@@ -1193,12 +1310,12 @@ function render() {
 
    // game.debug.text('dish: '+atexst,32,62);
    // game.debug.text('item: '+atexst2,422,62);
-  //  game.debug.text('needs potato '+text1,32,82);
+   //game.debug.text('timer'+num1,32,82);
    // game.debug.text('needs tomato '+text2,32,102);
    // game.debug.text('needs steak '+text3,32,122);
 	
 	//game.debug.body(bottomCollider);
-	//game.debug.bodyInfo(bottomCollider,32,32);
+	//game.debug.bodyInfo(topCollider,32,32);
 	//game.debug.bodyInfo(bottomCollider,32,32);
 	//game.debug.body(topCollider);
 //	game.debug.bodyInfo(topCollider,32,32);
