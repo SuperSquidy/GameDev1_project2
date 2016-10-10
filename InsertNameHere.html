@@ -625,7 +625,11 @@ function collisionHandler (obj1, obj2) {
 function spawnDishes()
 {
 	//timer so that the dishes spawn with enough space on them
+<<<<<<< HEAD
 	if (game.time.now > (dishTime+500))
+=======
+	if (game.time.now > dishTime)
+>>>>>>> origin/master
     {
 		//random counter to spawn dishes
 		ranD = Math.floor(Math.random()*2);
@@ -1186,8 +1190,13 @@ function render() {
    // game.debug.text('needs tomato '+text2,32,102);
    // game.debug.text('needs steak '+text3,32,122);
 	
+<<<<<<< HEAD
 	game.debug.body(bottomCollider);
 	game.debug.bodyInfo(bottomCollider,32,32);
+=======
+	//game.debug.body(bottomCollider);
+	//game.debug.bodyInfo(bottomCollider,32,32);
+>>>>>>> origin/master
 	//game.debug.bodyInfo(bottomCollider,32,32);
 	//game.debug.body(topCollider);
 //	game.debug.bodyInfo(topCollider,32,32);
