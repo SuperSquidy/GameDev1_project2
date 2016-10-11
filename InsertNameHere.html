@@ -13,9 +13,7 @@ var game = new Phaser.Game(1334,750, Phaser.AUTO, '',
 { preload: preload, create: create, update: update, render: render });
 
 /* TODO
-scoring system
 5second timer for dead stuff
-swipe 
 reset deadT when we drag
 rotten food. add a variable to food now to see if its rotten or not
 Add items to points
@@ -101,6 +99,8 @@ var timeElapsed = 0;
 var compDishes =0;
 //variable for temp text
 var timerText;
+var scoreText;
+var score=0;
 var MenuDelayTime=0;
 var PauseDelayTime=0;
 var w=800;
@@ -117,6 +117,7 @@ function create()
 	game.add.image(0,0, 'background');
 	//time elapsed
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
+    scoreText = game.add.bitmapText(800, 10, 'desyrel', '', 32);
     warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
 	
 	game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -423,6 +424,7 @@ function create()
     // Create a label to use as a button
 
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
+    scoreText = game.add.bitmapText(800, 10, 'desyrel', '', 32);
     warningText = game.add.bitmapText(475, 350, 'desyrel', '', 64);
     pause_label = game.add.bitmapText(1250, 10, 'desyrel', '', 32);
     
@@ -781,6 +783,7 @@ function startTimer()
 {
 	stateText.text='RESTART';
 	timeElapsed=game.time.now - MenuDelayTime-p;
+	scoreText.text = 'Score: ' + score;
     timerText.text = 'Time Elapsed: 0:0' + Math.floor(Math.round(timeElapsed)/1000); //display the timer
         
     if (Math.floor(Math.round(timeElapsed)/1000) >= 10) //making sure the seconds do not overflow
@@ -905,6 +908,7 @@ function collision (obj1, obj2)
 		//if I killed the objected here it owul dmess wiht the otehr dishes so I just move it out of the screen.
 		obj1.reset(2000,800);
 		compDishes++;
+		score += 300;
 	}
 	text1 = obj1.i1;
 	text2 = obj1.i2;
