@@ -946,7 +946,6 @@ function collision (obj1, obj2)
 		obj1.reset(2000,800);*/
 		aDish.finished = true;
 		compDishes++;
-		score += 300;
 	}
 	text1 = obj1.i1;
 	text2 = obj1.i2;
@@ -1172,6 +1171,10 @@ function resetDish1(dish)
 	//add sound maybe if the player does not complete??
 	if(dish.x>200)
 	{
+		if(dish.finished)
+			score += 300
+		else
+			score -= 150
 		dish.destroy();
 	}
 	//create the variable with the first dish sprite
