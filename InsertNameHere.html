@@ -30,32 +30,32 @@ function preload(){
     game.load.image('plate2', 'dish2plate.png');
 	//sprite for tomato
     game.load.spritesheet('tomato', 'foodTomato_SpriteSheet.png', 70,70);
-    game.load.spritesheet('tomatoRot', 'foodTomato_SpriteSheet2.png', 70,70);
+    game.load.spritesheet('tomatoRot', 'RottenTomato_SpriteSheet.png', 70,70);
     game.load.image('tomato2', 'foodTomato_static.png');
     game.load.image('tomato_dead', 'tomatoDead.png');
 	//sprite for steak
     game.load.spritesheet('steak', 'foodSteak_SpriteSheet.png',70,100);	
-    game.load.spritesheet('steakRot', 'foodSteak_SpriteSheet.png',70,100);	//change
+    game.load.spritesheet('steakRot', 'RottenSteak_SpriteSheet.png',70,100);	//change
     game.load.image('steak2', 'foodSteak_static.png');
     game.load.image('steak_dead', 'steakDead.png');
 	//sprite for pepper
 	game.load.spritesheet('pepper', 'foodPepper_SpriteSheet.png',50,80);
-	game.load.spritesheet('pepperRot', 'foodPepper_SpriteSheet.png',50,80);//change
+	game.load.spritesheet('pepperRot', 'RottenPepper_SpriteSheet.png',50,80);//change
     game.load.image('pepper2', 'foodPepper_static.png');
     game.load.image('pepper_dead', 'pepperDead.png');
 	//sprite for wing
     game.load.spritesheet('wing', 'foodWing_SpriteSheet.png',55,60);
-    game.load.spritesheet('wingRot', 'foodWing_SpriteSheet.png',55,60);//change
+    game.load.spritesheet('wingRot', 'RottenWing_SpriteSheet.png',55,60);//change
     game.load.image('wing2', 'foodWing_static.png');
     game.load.image('wing_dead', 'wingDead.png');
 	//sprite for potato
 	game.load.spritesheet('potato', 'foodPotato_SpriteSheet.png',75,95);
-	game.load.spritesheet('potatoRot', 'foodPotato_SpriteSheet.png',75,95);//change
+	game.load.spritesheet('potatoRot', 'RottenPotato_SpriteSheet.png',75,95);//change
     game.load.image('potato2', 'foodPotato_static.png');
     game.load.image('potato_dead', 'potatoDead.png');
 	//sprite for celery
 	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,180);
-	game.load.spritesheet('celeryRot', 'foodCelery_SpriteSheet.png',90,180);//change
+	game.load.spritesheet('celeryRot', 'RottenCelery_SpriteSheet.png',90,180);//change
     game.load.image('celery2', 'foodCelery_static.png');
     game.load.image('celery_dead', 'celeryDead.png');
 	//font
@@ -691,264 +691,51 @@ function collision (obj1, obj2)
 	atexst=obj1.name;
 	atexst2=obj2.name;
 	obj2.kill();
-	if(obj1.i1)
-	{
-		if(obj2.name=== obj1.recipe[0])
+	if(obj2.isRot===false)
 		{
-			obj1.i1=false;
-			obj1.h-=1;
-			obj1.ings.children[0].visible = false;
-			obj1.fin.children[0].visible = true;
-		}
-	}
-	if(obj1.i2)
-	{
-		if(obj2.name=== obj1.recipe[1])
+		if(obj1.i1)
 		{
-			obj1.i2=false;
-			obj1.h-=1;
-			obj1.ings.children[1].visible = false;
-			obj1.fin.children[1].visible = true;
+			if(obj2.name=== obj1.recipe[0])
+			{
+				obj1.i1=false;
+				obj1.h-=1;
+				obj1.ings.children[0].visible = false;
+				obj1.fin.children[0].visible = true;
+			}
 		}
-	}
-	if(obj1.i3)
-	{
-		if(obj2.name=== obj1.recipe[2])
+		if(obj1.i2)
 		{
-			obj1.i3=false;
-			obj1.h-=1;
-			obj1.ings.children[2].visible = false;
-			obj1.fin.children[2].visible = true;
+			if(obj2.name=== obj1.recipe[1])
+			{
+				obj1.i2=false;
+				obj1.h-=1;
+				obj1.ings.children[1].visible = false;
+				obj1.fin.children[1].visible = true;
+			}
+		}
+		if(obj1.i3)
+		{
+			if(obj2.name=== obj1.recipe[2])
+			{
+				obj1.i3=false;
+				obj1.h-=1;
+				obj1.ings.children[2].visible = false;
+				obj1.fin.children[2].visible = true;
+			}
+		}
+		if(obj1.i1===false&&obj1.i2===false&&obj1.i3===false)
+		{
+			//if I killed the objected here it owul dmess wiht the otehr dishes so I just move it out of the screen.
+			/*for(var j = 0; j < obj1.fin.children.length; j++){
+				obj1.fin.children[j].visible = false;
+			}
+			obj1.reset(2000,800);*/
+			obj1.finished = true;
+			compDishes++;
 		}
 	}
-    if(obj1.i1===false&&obj1.i2===false&&obj1.i3===false)
-	{
-		//if I killed the objected here it owul dmess wiht the otehr dishes so I just move it out of the screen.
-		/*for(var j = 0; j < obj1.fin.children.length; j++){
-			obj1.fin.children[j].visible = false;
-		}
-		obj1.reset(2000,800);*/
-		obj1.finished = true;
-		compDishes++;
-	}
-	text1 = obj1.i1;
-	text2 = obj1.i2;
-	text3 = obj1.i3;
 }
-function spawnTomato()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > tomatoTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		tomato = tomatoes.getFirstExists(false);
-        if (tomato)
-        {
-			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				tomato.reset(-200,y);
-				tomato.body.velocity.x = 130+Math.random()*100;
-				tomato.animations.play('right', 15, true);
-			}else{
-				tomato.reset(1334,y);
-				tomato.body.velocity.x = (130+Math.random()*100)*(-1);
-				tomato.animations.play('left', 15, true);
-				}
-			
-			if(y>300)
-			{
-				tomato.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				tomato.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            tomatoTime = (game.time.now + Math.random()*10000);
-        }
-    }
-	
-}
-function spawnWing()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > wingTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		wing = wings.getFirstExists(false);
-        if (wing)
-        {
-			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				wing.reset(-200,y);
-				wing.body.velocity.x = 130+Math.random()*100;
-				wing.animations.play('right', 15, true);
-			}else{
-				wing.reset(1334,y);
-				wing.body.velocity.x = (130+Math.random()*100)*(-1);
-				wing.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				wing.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				wing.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            wingTime = (game.time.now + Math.random()*10000);
-        }
-    }
-	
-}
-function spawnPepper()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > pepperTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		pepper = peppers.getFirstExists(false);
-        if (pepper)
-        {
-			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				pepper.reset(-200,y);
-				pepper.body.velocity.x = 130+Math.random()*100;
-				pepper.animations.play('right', 15, true);
-			}else{
-				pepper.reset(1334,y);
-				pepper.body.velocity.x = (130+Math.random()*100)*(-1);
-				pepper.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				pepper.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				pepper.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            pepperTime = (game.time.now + Math.random()*10000);
-        }
-    }
-	
-}
-function spawnPotato()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > potatoTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		potato = potatoes.getFirstExists(false);
-        if (potato)
-        {
-			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD===1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				potato.reset(-200,y);
-				potato.body.velocity.x = 130+Math.random()*100;
-				potato.animations.play('right', 15, true);
-			}else{
-				potato.reset(1334,y);
-				potato.body.velocity.x = (130+Math.random()*100)*(-1);
-				potato.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				potato.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				potato.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            potatoTime = (game.time.now + Math.random()*10000);
-        }
-    }
-}
-function spawnCelery()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > celeryTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		celery = celeries.getFirstExists(false);
-        if (celery)
-        {
-			celery.alive=true;
-			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD===1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				celery.reset(-200,y);
-				celery.body.velocity.x = 130+Math.random()*100;
-				celery.animations.play('right', 15, true);
-			}else{
-				celery.reset(1334,y);
-				celery.body.velocity.x = (130+Math.random()*100)*(-1);
-				celery.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				celery.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				celery.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            celeryTime = (game.time.now + Math.random()*10000);
-        }
-    }
-}
-function spawnSteak()
-{
-	//timer so that the dishes spawn with enough space on them
-	if (game.time.now > steakTime)
-    {
-		//random counter to spawn dishes
-		ranD = Math.floor(Math.random()*2);
-		steak = steaks.getFirstExists(false);
-        if (steak)
-        {
-			steak.alive=true;
-			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD==1)
-			{
-				//spawn the dishes offscreen so they can go and move into the screen
-				steak.reset(-200,y);
-				steak.body.velocity.x = 130+Math.random()*100;
-				steak.animations.play('right', 15, true);
-			}else{
-				steak.reset(1334,y);
-				steak.body.velocity.x = (130+Math.random()*100)*(-1);
-				steak.animations.play('left', 15, true);
-				}
-			
-			ranD = Math.floor(Math.random()*2);
-			if(y>300)
-			{
-				steak.body.velocity.y = (Math.random()*100)*-1;
-			}else{
-				steak.body.velocity.y = (Math.random()*100);
-			}
-			//spawn timer... 5000 = 5 sec.
-            steakTime = (game.time.now + Math.random()*10000);
-        }
-    }
-}
+
 function createDish1()
 {
 	//create the variable with the first dish sprite
@@ -985,6 +772,7 @@ function createDish1()
 	}	
 	aDish.events.onOutOfBounds.add(resetDish1, this);
 }
+
 function resetDish1(dish)
 {
 	//picked 200 so that when it spawns it does not kill because dish spawns at x=-200
@@ -1000,7 +788,9 @@ function resetDish1(dish)
 	}
 	createDish1();
 }
-function createDish2(){
+
+function createDish2()
+{
 	    var aDish = dishesG2.create(0, 0, 'plate2');
         aDish.exists = false;
 		aDish.name = 'game';
@@ -1032,6 +822,7 @@ function createDish2(){
     	}	
         aDish.events.onOutOfBounds.add(resetDish2, this);
 }
+
 function resetDish2(dish)
 {
 	//picked 200 so that when it spawns it does not kill because dish spawns at x=-200
@@ -1043,6 +834,7 @@ function resetDish2(dish)
 	}
 	createDish2();
 }
+
 function createTomato()
 {
 	ranD = Math.floor(Math.random()*2);
@@ -1074,6 +866,43 @@ function createTomato()
 	aTomato.events.onDragStop.add(resetTimer2, this);    
 	aTomato.events.onOutOfBounds.add(resetTomato, this);
 }
+
+function spawnTomato()
+{
+	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > tomatoTime)
+    {
+		//random counter to spawn dishes
+		ranD = Math.floor(Math.random()*2);
+		tomato = tomatoes.getFirstExists(false);
+        if (tomato)
+        {
+			y = Math.floor(Math.random()*150)+spawnY;
+			if(ranD==1)
+			{
+				//spawn the dishes offscreen so they can go and move into the screen
+				tomato.reset(-200,y);
+				tomato.body.velocity.x = 130+Math.random()*100;
+				tomato.animations.play('right', 15, true);
+			}else{
+				tomato.reset(1334,y);
+				tomato.body.velocity.x = (130+Math.random()*100)*(-1);
+				tomato.animations.play('left', 15, true);
+				}
+			
+			if(y>300)
+			{
+				tomato.body.velocity.y = (Math.random()*100)*-1;
+			}else{
+				tomato.body.velocity.y = (Math.random()*100);
+			}
+			//spawn timer... 5000 = 5 sec.
+            tomatoTime = (game.time.now + Math.random()*10000);
+        }
+    }
+	
+}
+
 function resetTomato(item)
 {
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
@@ -1090,6 +919,7 @@ function resetTomato(item)
 	createTomato();
 
 }
+
 function createWing()
 {
 	//create the variable with the first dish sprite
@@ -1122,6 +952,44 @@ function createWing()
 	aWing.events.onDragStop.add(resetTimer2, this);
     aWing.events.onOutOfBounds.add(resetWing, this);
 }
+
+function spawnWing()
+{
+	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > wingTime)
+    {
+		//random counter to spawn dishes
+		ranD = Math.floor(Math.random()*2);
+		wing = wings.getFirstExists(false);
+        if (wing)
+        {
+			y = Math.floor(Math.random()*150)+spawnY;
+			if(ranD==1)
+			{
+				//spawn the dishes offscreen so they can go and move into the screen
+				wing.reset(-200,y);
+				wing.body.velocity.x = 130+Math.random()*100;
+				wing.animations.play('right', 15, true);
+			}else{
+				wing.reset(1334,y);
+				wing.body.velocity.x = (130+Math.random()*100)*(-1);
+				wing.animations.play('left', 15, true);
+				}
+			
+			ranD = Math.floor(Math.random()*2);
+			if(y>300)
+			{
+				wing.body.velocity.y = (Math.random()*100)*-1;
+			}else{
+				wing.body.velocity.y = (Math.random()*100);
+			}
+			//spawn timer... 5000 = 5 sec.
+            wingTime = (game.time.now + Math.random()*10000);
+        }
+    }
+	
+}
+
 function resetWing(item)
 {
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
@@ -1138,6 +1006,7 @@ function resetWing(item)
 	createWing();
 
 }
+
 function createPepper()
 {
 	//create the variable with the first dish sprite
@@ -1172,6 +1041,44 @@ function createPepper()
 	aPepper.events.onDragStop.add(resetTimer2, this);
 	aPepper.events.onOutOfBounds.add(resetPepper, this);
 }
+
+function spawnPepper()
+{
+	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > pepperTime)
+    {
+		//random counter to spawn dishes
+		ranD = Math.floor(Math.random()*2);
+		pepper = peppers.getFirstExists(false);
+        if (pepper)
+        {
+			y = Math.floor(Math.random()*150)+spawnY;
+			if(ranD==1)
+			{
+				//spawn the dishes offscreen so they can go and move into the screen
+				pepper.reset(-200,y);
+				pepper.body.velocity.x = 130+Math.random()*100;
+				pepper.animations.play('right', 15, true);
+			}else{
+				pepper.reset(1334,y);
+				pepper.body.velocity.x = (130+Math.random()*100)*(-1);
+				pepper.animations.play('left', 15, true);
+				}
+			
+			ranD = Math.floor(Math.random()*2);
+			if(y>300)
+			{
+				pepper.body.velocity.y = (Math.random()*100)*-1;
+			}else{
+				pepper.body.velocity.y = (Math.random()*100);
+			}
+			//spawn timer... 5000 = 5 sec.
+            pepperTime = (game.time.now + Math.random()*10000);
+        }
+    }
+	
+}
+
 function resetPepper(item)
 {
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
@@ -1187,7 +1094,9 @@ function resetPepper(item)
 	}
 	createPepper();
 }
-function createSteak(){
+
+function createSteak()
+{
 
 	//create the variable with the first dish sprite   
 	ranD = Math.floor(Math.random()*2);
@@ -1220,6 +1129,44 @@ function createSteak(){
 	aSteak.events.onDragStop.add(resetTimer2, this);
 	aSteak.input.enableDrag(true);
 }
+
+function spawnSteak()
+{
+	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > steakTime)
+    {
+		//random counter to spawn dishes
+		ranD = Math.floor(Math.random()*2);
+		steak = steaks.getFirstExists(false);
+        if (steak)
+        {
+			steak.alive=true;
+			y = Math.floor(Math.random()*150)+spawnY;
+			if(ranD==1)
+			{
+				//spawn the dishes offscreen so they can go and move into the screen
+				steak.reset(-200,y);
+				steak.body.velocity.x = 130+Math.random()*100;
+				steak.animations.play('right', 15, true);
+			}else{
+				steak.reset(1334,y);
+				steak.body.velocity.x = (130+Math.random()*100)*(-1);
+				steak.animations.play('left', 15, true);
+				}
+			
+			ranD = Math.floor(Math.random()*2);
+			if(y>300)
+			{
+				steak.body.velocity.y = (Math.random()*100)*-1;
+			}else{
+				steak.body.velocity.y = (Math.random()*100);
+			}
+			//spawn timer... 5000 = 5 sec.
+            steakTime = (game.time.now + Math.random()*10000);
+        }
+    }
+}
+
 function resetSteak(item)
 {
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
@@ -1235,6 +1182,7 @@ function resetSteak(item)
 	}
 	createSteak();
 }
+
 function createPotato()
 {
 	//create the variable with the first dish sprite
@@ -1266,6 +1214,43 @@ function createPotato()
 	aPotato.events.onDragStop.add(resetTimer2, this);
 	aPotato.input.enableDrag(true);
 }
+
+function spawnPotato()
+{
+	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > potatoTime)
+    {
+		//random counter to spawn dishes
+		ranD = Math.floor(Math.random()*2);
+		potato = potatoes.getFirstExists(false);
+        if (potato)
+        {
+			y = Math.floor(Math.random()*150)+spawnY;
+			if(ranD===1)
+			{
+				//spawn the dishes offscreen so they can go and move into the screen
+				potato.reset(-200,y);
+				potato.body.velocity.x = 130+Math.random()*100;
+				potato.animations.play('right', 15, true);
+			}else{
+				potato.reset(1334,y);
+				potato.body.velocity.x = (130+Math.random()*100)*(-1);
+				potato.animations.play('left', 15, true);
+				}
+			
+			ranD = Math.floor(Math.random()*2);
+			if(y>300)
+			{
+				potato.body.velocity.y = (Math.random()*100)*-1;
+			}else{
+				potato.body.velocity.y = (Math.random()*100);
+			}
+			//spawn timer... 5000 = 5 sec.
+            potatoTime = (game.time.now + Math.random()*10000);
+        }
+    }
+}
+
 function resetPotato(item)
 {
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
@@ -1282,6 +1267,7 @@ function resetPotato(item)
 	createPotato();
 
 }
+
 function createCelery()
 {
 	//create the variable with the first dish sprite
@@ -1314,6 +1300,44 @@ function createCelery()
 	aCelery.input.enableDrag(true);
 	
 }
+
+function spawnCelery()
+{
+	//timer so that the dishes spawn with enough space on them
+	if (game.time.now > celeryTime)
+    {
+		//random counter to spawn dishes
+		ranD = Math.floor(Math.random()*2);
+		celery = celeries.getFirstExists(false);
+        if (celery)
+        {
+			celery.alive=true;
+			y = Math.floor(Math.random()*150)+spawnY;
+			if(ranD===1)
+			{
+				//spawn the dishes offscreen so they can go and move into the screen
+				celery.reset(-200,y);
+				celery.body.velocity.x = 130+Math.random()*100;
+				celery.animations.play('right', 15, true);
+			}else{
+				celery.reset(1334,y);
+				celery.body.velocity.x = (130+Math.random()*100)*(-1);
+				celery.animations.play('left', 15, true);
+				}
+			
+			ranD = Math.floor(Math.random()*2);
+			if(y>300)
+			{
+				celery.body.velocity.y = (Math.random()*100)*-1;
+			}else{
+				celery.body.velocity.y = (Math.random()*100);
+			}
+			//spawn timer... 5000 = 5 sec.
+            celeryTime = (game.time.now + Math.random()*10000);
+        }
+    }
+}
+
 function resetCelery(item)
 {
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
@@ -1331,6 +1355,7 @@ function resetCelery(item)
 	createCelery();
 
 }
+
 function render() {
 
    // game.debug.text('dish: '+atexst,32,62);
