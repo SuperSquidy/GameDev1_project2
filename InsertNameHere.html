@@ -33,26 +33,32 @@ function preload(){
     game.load.spritesheet('tomato', 'foodTomato_SpriteSheet.png', 70,70);
     game.load.spritesheet('tomatoRot', 'foodTomato_SpriteSheet2.png', 70,70);
     game.load.image('tomato2', 'foodTomato_static.png');
+    game.load.image('tomato_dead', 'foodTomato_static.png');
 	//sprite for steak
     game.load.spritesheet('steak', 'foodSteak_SpriteSheet.png',70,100);	
     game.load.spritesheet('steakRot', 'foodSteak_SpriteSheet.png',70,100);	//change
     game.load.image('steak2', 'foodSteak_static.png');
+    game.load.image('steak_dead', 'foodSteak_static.png');
 	//sprite for pepper
 	game.load.spritesheet('pepper', 'foodPepper_SpriteSheet.png',50,80);
 	game.load.spritesheet('pepperRot', 'foodPepper_SpriteSheet.png',50,80);//change
     game.load.image('pepper2', 'foodPepper_static.png');
+    game.load.image('pepper_dead', 'foodPepper_static.png');
 	//sprite for wing
     game.load.spritesheet('wing', 'foodWing_SpriteSheet.png',55,60);
     game.load.spritesheet('wingRot', 'foodWing_SpriteSheet.png',55,60);//change
     game.load.image('wing2', 'foodWing_static.png');
+    game.load.image('wing_dead', 'foodWing_static.png');
 	//sprite for potato
 	game.load.spritesheet('potato', 'foodPotato_SpriteSheet.png',75,95);
 	game.load.spritesheet('potatoRot', 'foodPotato_SpriteSheet.png',75,95);//change
     game.load.image('potato2', 'foodPotato_static.png');
+    game.load.image('potato_dead', 'foodPotato_static.png');
 	//sprite for celery
 	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,180);
 	game.load.spritesheet('celeryRot', 'foodCelery_SpriteSheet.png',90,180);//change
     game.load.image('celery2', 'foodCelery_static.png');
+    game.load.image('celery_dead', 'foodCelery_static.png');
 	//font
     game.load.bitmapFont('desyrel', 'desyrel.png', 'desyrel.xml');
 }
@@ -375,6 +381,16 @@ function create()
 		aDish.i1=true;
 		aDish.i2=true;
 		aDish.i3=true;
+		aDish.finished = false;
+		aDish.fin = game.add.group();
+		aDish.fin.enableBody = true;
+		aDish.fin.physicsBodyType = Phaser.Physics.ARCADE;
+		var icon = aDish.fin.create(0, 0, 'potato_dead');
+		var icon = aDish.fin.create(0, 0, 'tomato_dead');
+		var icon = aDish.fin.create(0, 0, 'steak_dead');
+		for(var j = 0; j < aDish.fin.children.length; j++){
+			aDish.fin.children[j].visible = false;
+		}
 		aDish.ings = game.add.group();
 		aDish.ings.enableBody = true;
     	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
@@ -399,6 +415,16 @@ function create()
 		aDish.i1=true;
 		aDish.i2=true;
 		aDish.i3=true;
+		aDish.finished = false;
+		aDish.fin = game.add.group();
+		aDish.fin.enableBody = true;
+		aDish.fin.physicsBodyType = Phaser.Physics.ARCADE;
+		var icon = aDish.fin.create(0, 0, 'wing_dead');
+		var icon = aDish.fin.create(0, 0, 'pepper_dead');
+		var icon = aDish.fin.create(0, 0, 'celery_dead');
+		for(var j = 0; j < aDish.fin.children.length; j++){
+			aDish.fin.children[j].visible = false;
+		}
 		aDish.ings = game.add.group();
 		aDish.ings.enableBody = true;
     	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
@@ -857,6 +883,11 @@ function spawnDishes()
             	dish.ings.children[j].reset(-210 + (j * 40), 560);
             	dish.ings.children[j].body.velocity.x = 43 + compDishes * 2;
             }
+            for(var j = 0; j < dish.fin.children.length; j++){
+            	dish.fin.children[j].reset(-210 + (j * 40), 450);
+            	dish.fin.children[j].body.velocity.x = 43 + compDishes * 2;
+            	dish.fin.children[j].visible = false;
+            }
 			//with the velocity, speed of 130 = 10seconds... 43==30seconds or so
             dish.body.velocity.x = 43 + compDishes * 2;
 			//spawn timer... 5000 = 5 sec.
@@ -883,6 +914,7 @@ function collision (obj1, obj2)
 			obj1.i1=false;
 			obj1.h-=1;
 			obj1.ings.children[0].visible = false;
+			obj1.fin.children[0].visible = true;
 		}
 	}
 	if(obj1.i2)
@@ -892,6 +924,7 @@ function collision (obj1, obj2)
 			obj1.i2=false;
 			obj1.h-=1;
 			obj1.ings.children[1].visible = false;
+			obj1.fin.children[1].visible = true;
 		}
 	}
 	if(obj1.i3)
@@ -901,12 +934,17 @@ function collision (obj1, obj2)
 			obj1.i3=false;
 			obj1.h-=1;
 			obj1.ings.children[2].visible = false;
+			obj1.fin.children[2].visible = true;
 		}
 	}
     if(obj1.i1===false&&obj1.i2===false&&obj1.i3===false)
 	{
 		//if I killed the objected here it owul dmess wiht the otehr dishes so I just move it out of the screen.
-		obj1.reset(2000,800);
+		/*for(var j = 0; j < obj1.fin.children.length; j++){
+			obj1.fin.children[j].visible = false;
+		}
+		obj1.reset(2000,800);*/
+		aDish.finished = true;
 		compDishes++;
 		score += 300;
 	}
@@ -1148,6 +1186,16 @@ function resetDish1(dish)
 	aDish.i1=true;
 	aDish.i2=true;
 	aDish.i3=true;
+	aDish.finished = false;
+	aDish.fin = game.add.group();
+	aDish.fin.enableBody = true;
+	aDish.fin.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.fin.create(0, 0, 'potato_dead');
+	var icon = aDish.fin.create(0, 0, 'tomato_dead');
+	var icon = aDish.fin.create(0, 0, 'steak_dead');
+	for(var j = 0; j < aDish.fin.children.length; j++){
+		aDish.fin.children[j].visible = false;
+	}	
 	aDish.ings = game.add.group();
 	aDish.ings.enableBody = true;
 	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
@@ -1181,6 +1229,16 @@ function resetDish2(dish)
 	aDish.i1=true;
 	aDish.i2=true;
 	aDish.i3=true;
+	aDish.finished = false;
+	aDish.fin = game.add.group();
+	aDish.fin.enableBody = true;
+	aDish.fin.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.fin.create(0, 0, 'wing_dead');
+	var icon = aDish.fin.create(0, 0, 'pepper_dead');
+	var icon = aDish.fin.create(0, 0, 'celery_dead');
+	for(var j = 0; j < aDish.fin.children.length; j++){
+		aDish.fin.children[j].visible = false;
+	}
 	aDish.ings = game.add.group();
 	aDish.ings.enableBody = true;
 	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
