@@ -108,6 +108,7 @@ var h=600;
 var stop=true;
 var p=0;
 var stateText;
+var deadFood = [];
 //variable for 30 second warning
 var warningText;
 function create()
@@ -193,7 +194,7 @@ function create()
 		aTomato.name = 'tomato';
         aTomato.exists = false;
         aTomato.visible = false;
-		aTomato.deadT=0;
+		aTomato.deadT= -1;
 		//activate world bounds with the object so that it can die when its complete
         aTomato.checkWorldBounds = true;
 		aTomato.body.bounce.set(1);
@@ -226,7 +227,7 @@ function create()
 		aWing.name = 'wing';
         aWing.exists = false;
         aWing.visible = false;
-		aWing.deadT=0;
+		aWing.deadT= -1;
 		//activate world bounds with the object so that it can die when its complete
         aWing.checkWorldBounds = true;
 		aWing.body.bounce.set(1);
@@ -259,7 +260,7 @@ function create()
 		aPepper.name = 'pepper';
         aPepper.exists = false;
         aPepper.visible = false;
-		aPepper.deadT=0;
+		aPepper.deadT= -1;
 		//activate world bounds with the object so that it can die when its complete
         aPepper.checkWorldBounds = true;
 		aPepper.body.bounce.set(1);
@@ -293,7 +294,7 @@ function create()
 		//activate world bounds with the object so that it can die when its complete
 		aSteak.checkWorldBounds = true;
 		aSteak.body.bounce.set(1);
-		aSteak.deadT=0;
+		aSteak.deadT= -1;
 		aSteak.events.onOutOfBounds.add(resetSteak, this);
 		//allow toato to be dragged
 		aSteak.inputEnabled = true; 
@@ -318,7 +319,7 @@ function create()
 		//don't spawn it yet
         aPotato.exists = false;
         aPotato.name = 'potato';
-		aPotato.deadT=0;
+		aPotato.deadT= -1;
         aPotato.visible = false;
 		aPotato.body.bounce.set(1);
 		//activate world bounds with the object so that it can die when its complete
@@ -346,8 +347,8 @@ function create()
 		aCelery.animations.play('right', 12, true);
 		//don't spawn it yet
         aCelery.exists = false;
-        aCelery.name = 'potato';
-		aCelery.deadT=0;
+        aCelery.name = 'celery';
+		aCelery.deadT= -1;
         aCelery.visible = false;
 		aCelery.body.bounce.set(1);
 		//activate world bounds with the object so that it can die when its complete
@@ -376,6 +377,7 @@ function create()
 		aDish.ings = game.add.group();
 		aDish.ings.enableBody = true;
     	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+    	aDish.recipe = ['potato', 'tomato', 'steak'];
     	var icon = aDish.ings.create(0, 0, 'potato2');
     	var icon = aDish.ings.create(0, 0, 'tomato2');
     	var icon = aDish.ings.create(0, 0, 'steak2');
@@ -399,9 +401,10 @@ function create()
 		aDish.ings = game.add.group();
 		aDish.ings.enableBody = true;
     	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
-		var icon = aDish.ings.create(0, 0, 'potato2');
-    	var icon = aDish.ings.create(0, 0, 'tomato2');
-    	var icon = aDish.ings.create(0, 0, 'steak2');
+    	aDish.recipe = ['wing', 'pepper', 'celery'];  
+		var icon = aDish.ings.create(0, 0, 'wing2');
+    	var icon = aDish.ings.create(0, 0, 'pepper2');
+    	var icon = aDish.ings.create(0, 0, 'celery2');
 		for(var j = 0; j < aDish.ings.children.length; j++){
     		aDish.ings.children[j].visible = false;
     	}	
@@ -508,7 +511,6 @@ function beginGame()
 }
 function update()
 {
-	
 	// make a function that checks if the dishes are complete
 	if(canSpawn)
 	{
@@ -535,12 +537,12 @@ function update()
 	game.physics.arcade.collide(wings, bottomCollider);
 	
 
-	steaks.onChildInputOver.add(setDead, this);
-	potatoes.onChildInputOver.add(setDead, this);
-	tomatoes.onChildInputOver.add(setDead, this);
-	celeries.onChildInputOver.add(setDead, this);
-	peppers.onChildInputOver.add(setDead, this);
-	wings.onChildInputOver.add(setDead, this);
+	steaks.onChildInputOver.add(isCutting, this);
+	potatoes.onChildInputOver.add(isCutting, this);
+	tomatoes.onChildInputOver.add(isCutting, this);
+	celeries.onChildInputOver.add(isCutting, this);
+	peppers.onChildInputOver.add(isCutting, this);
+	wings.onChildInputOver.add(isCutting, this);
 
 	//if the player hits the item then kill it..
 	//change this to if it is swiped correctly
@@ -718,8 +720,15 @@ function update()
 		game.physics.arcade.overlap(wings, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(peppers, dishesG2.children[i], collision, null, this);
 	}
-}
 
+}
+function isCutting(obj){
+	if(game.input.x > obj.body.x && game.input.x < obj.body.right && game.input.y > obj.body.y && game.input.y < obj.body.bottom && isDrag){
+		obj.alive=false;
+		obj.body.velocity.x=0;
+		obj.body.velocity.y=0;
+	}
+}
 function setPause(obj)
 {
 	if(p)
@@ -734,12 +743,12 @@ function setPause(obj)
 }
 function setDead(obj)
 {
-	if(isDrag)
-	{
+	//if(isDrag)
+	//{
 		obj.alive=false;
 		obj.body.velocity.x=0;
 		obj.body.velocity.y=0;	
-	}
+	//}
 }
 function dodge(st){
 	
@@ -866,7 +875,7 @@ function collision (obj1, obj2)
 	obj2.kill();
 	if(obj1.i1)
 	{
-		if(obj2.name==='potato')
+		if(obj2.name=== obj1.recipe[0])
 		{
 			obj1.i1=false;
 			obj1.h-=1;
@@ -875,7 +884,7 @@ function collision (obj1, obj2)
 	}
 	if(obj1.i2)
 	{
-		if(obj2.name==='tomato')
+		if(obj2.name=== obj1.recipe[1])
 		{
 			obj1.i2=false;
 			obj1.h-=1;
@@ -884,7 +893,7 @@ function collision (obj1, obj2)
 	}
 	if(obj1.i3)
 	{
-		if(obj2.name==='steak')
+		if(obj2.name=== obj1.recipe[2])
 		{
 			obj1.i3=false;
 			obj1.h-=1;
@@ -1019,7 +1028,7 @@ function spawnPotato()
         if (potato)
         {
 			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD==1)
+			if(ranD===1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
 				potato.reset(-200,y);
@@ -1054,7 +1063,7 @@ function spawnCelery()
         if (celery)
         {
 			y = Math.floor(Math.random()*150)+spawnY;
-			if(ranD==1)
+			if(ranD===1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
 				celery.reset(-200,y);
@@ -1138,6 +1147,7 @@ function resetDish1(dish)
 	aDish.ings = game.add.group();
 	aDish.ings.enableBody = true;
 	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
+	aDish.recipe = ['potato', 'tomato', 'steak'];
 	var icon = aDish.ings.create(0, 0, 'potato2');
 	var icon = aDish.ings.create(0, 0, 'tomato2');
 	var icon = aDish.ings.create(0, 0, 'steak2');
@@ -1170,9 +1180,10 @@ function resetDish2(dish)
 	aDish.ings = game.add.group();
 	aDish.ings.enableBody = true;
 	aDish.ings.physicsBodyType = Phaser.Physics.ARCADE;
-	var icon = aDish.ings.create(0, 0, 'potato2');
-	var icon = aDish.ings.create(0, 0, 'tomato2');
-	var icon = aDish.ings.create(0, 0, 'steak2');
+	aDish.recipe = ['wing', 'pepper', 'celery'];
+	var icon = aDish.ings.create(0, 0, 'wing2');
+	var icon = aDish.ings.create(0, 0, 'pepper2');
+	var icon = aDish.ings.create(0, 0, 'celery2');
 	for(var j = 0; j < aDish.ings.children.length; j++){
 		aDish.ings.children[j].visible = false;
 	}	
@@ -1414,12 +1425,12 @@ function resetCelery(item)
 		var aCelery = celeries.create(0,0,'celeryRot');
 		aCelery.isRot=true;
 	}	
-	var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
-	var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 12, true);
-	aCelery.animations.play('right', 12, true);
+	var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
+	var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
+	aCelery.animations.play('right', 15, true);
 	//don't spawn it yet
 	aCelery.exists = false;
-	aCelery.name = 'potato';
+	aCelery.name = 'celery';
 	aCelery.visible = false;
 	aCelery.deadT=0;
 	aCelery.body.bounce.set(1);
