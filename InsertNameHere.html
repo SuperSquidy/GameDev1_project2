@@ -248,7 +248,7 @@ function create()
         
 
         // And a label to 
-        choiseLabel = game.add.bitmapText(660, h-150, 'desyrel', '- Slice ingredients to kill them -\n- Drag them to the correct dish -\n- Beat the dinner rush in 4 mins! -', 50 );
+        choiseLabel = game.add.bitmapText(675, 350, 'desyrel', '- Slice ingredients to kill them -\n- Drag them to the correct dish -\n- Beat the dinner rush in 4 mins! -', 50 );
         choiseLabel.anchor.setTo(0.5, 0.5);
         
         
@@ -311,7 +311,7 @@ function beginGame()
 		gameStartText.visible=false;//get rid of menu
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
-		delayTime = game.time.now; //keep track of when the user starts the game
+		MenuDelayTime = game.time.now; //keep track of when the user starts the game
 		pause_label.text='Pause';
 	}
 }
@@ -670,24 +670,17 @@ function startTimer()
     {
         timerText.text = 'Time Elapsed: 2:' + (Math.floor(Math.round(timeElapsed)/1000) - 120); 
     }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 180)
+    if (Math.floor(Math.round(timeElapsed)/1000) >= 150)
     {
-        timerText.text = 'Time Elapsed: 3:0' + (Math.floor(Math.round(timeElapsed)/1000) - 180); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 190)
-    {
-        timerText.text = 'Time Elapsed: 3:' + (Math.floor(Math.round(timeElapsed)/1000) - 180); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 210) //display a 30 second warning at the 3:30 mark
-    {
+        timerText.text = 'Time Elapsed: 2:' + (Math.floor(Math.round(timeElapsed)/1000) - 120); 
         warningText.text = '30 seconds left!'; 
 		crunchtime=true;
     }
-    if (Math.floor(Math.round(timeElapsed)/1000) > 213)
+    if (Math.floor(Math.round(timeElapsed)/1000) >= 153)
     {
-        warningText.text = ''; 
+        warningText.text = '';
     }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 240) 
+    if (Math.floor(Math.round(timeElapsed)/1000) >= 180) 
     {
     	if(score > 1500){
     		warningText.text = 'You win!';
@@ -697,6 +690,7 @@ function startTimer()
         timerText.text = '';
         canSpawn=false;
     }
+
 }
 function collisionHandler (obj1, obj2) {
 
