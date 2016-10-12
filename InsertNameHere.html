@@ -21,7 +21,7 @@ sound
 function preload(){
 
 	//video
-	game.load.video('video1', 'Take2d.mp4');
+	game.load.video('video1', 'food/opening/Take2c.mp4');
 	//background
 	game.load.image ('background', 'Proj2_Background (1).png');
     //sprite for dish1
@@ -64,7 +64,24 @@ function preload(){
 
     game.load.image('celery_dead', 'food/celeryDead.png');
 
-    game.load.audio('bg_music', 'sounds/Kitchen_Ambiance.wav');
+    game.load.audio('bg_music', 'sounds/Kitchen_Ambience.ogg');
+
+    game.load.audio('death_noise1', 'sounds/FoodDeath_1.ogg');
+    game.load.audio('death_noise2', 'sounds/FoodDeath_2.ogg');
+    game.load.audio('death_noise3', 'sounds/FoodDeath_3.ogg');
+    game.load.audio('death_noise4', 'sounds/FoodDeath_4.ogg');
+    game.load.audio('death_noise5', 'sounds/FoodDeath_5.ogg');
+
+    game.load.audio('knife_cut1', 'sounds/Knife_1.ogg');
+    game.load.audio('knife_cut2', 'sounds/Knife_2.ogg');
+    game.load.audio('knife_cut3', 'sounds/Knife_3.ogg');
+
+    game.load.audio('plate_noise1', 'sounds/PlateHit_1.ogg');
+    game.load.audio('plate_noise2', 'sounds/PlateHit_2.ogg');
+    game.load.audio('plate_noise3', 'sounds/PlateHit_3.ogg');
+    
+    game.load.audio('timer_noise', 'sounds/Timer_Bleep.ogg');
+    game.load.audio('cut_noise', 'sounds/Pepper_Cut.ogg');
 	//font
     game.load.bitmapFont('desyrel', 'desyrel.png', 'desyrel.xml');
 }
@@ -77,7 +94,7 @@ var gmText;
 var text1;
 var text2;
 var text3;
-var num1=10;
+var num1=0;
 var crunchtime=false;
 var spawnY=165;
 var p=true;
@@ -124,7 +141,6 @@ var h=600;
 var stop=true;
 var p=0;
 var stateText;
-var stateText2;
 var deadFood = [];
 //variable for 30 second warning
 var warningText;
@@ -136,16 +152,12 @@ function create()
 {
 	game.add.image(0,0, 'background');
 	music = game.add.audio('bg_music');
-	music.play();
 	gameStartText = game.add.text(game.world.centerX, 380, "Cut Fresh Food and Drag it to the appropriate dish \n Don't slice rotten food! \n Tap anywhere to start. ", { font: "40px Arial", fill: "#ffffff", align: "center" });
 	video = game.add.video('video1');
 	video.play(false);    
 	sprite1 = video.addToWorld(0,0 );
-	skipText = game.add.bitmapText(530, 650, 'desyrel', 'Click to Skip!', 50 );
-	
 
 	stateText=game.add.bitmapText(600,10,'desyrel','',16);
-	stateText2=game.add.bitmapText(600,10,'desyrel','',16);
 	
 	//time elapsed
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
@@ -321,7 +333,6 @@ function create()
 }
 function vidIsDone(){
 	vidDone=true;
-	skipText.destroy();
 	sprite1.destroy();
 }
 function setDragT()
@@ -336,14 +347,13 @@ function setDragF()
 function beginGame()
 {
 	if(inMenuScreen)
-	{
-		
+	{	
 		if(vidDone===false)
 		{
 			sprite1.destroy();
 			skipText.destroy();
 		}
-		sprite2 = game.add.image(0,0,'menuPicture');	
+		sprite2 = game.add.image(0,0,'menuPicture');
 		gameStartText.visible=false;//get rid of menu
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
@@ -598,10 +608,7 @@ function update()
 function isCutting(obj){
 	
 	if(game.input.x > obj.body.x && game.input.x < obj.body.right && game.input.y > obj.body.y && game.input.y < obj.body.bottom && isDrag){
-		if (obj.isRot==true &&obj.alive){score-=50;}
-		obj.alive=false;
-		obj.body.velocity.x=0;
-		obj.body.velocity.y=0;
+		setDead(obj);
 	}
 }
 function resetTimer1(obj)
@@ -626,10 +633,33 @@ function setPause(obj)
 }
 function setDead(obj)
 {
-	if (obj.isRot==true &&obj.alive){score-=50;}	
+	if (obj.isRot==true &&obj.alive){score-=50;}
+	if(obj.alive){
+		var num = Math.floor(Math.random()*5);
+		if(num === 1)
+			var noise = game.add.audio('death_noise1');
+		else if(num === 2)
+			var noise = game.add.audio('death_noise2');
+		else if(num === 3)
+			var noise = game.add.audio('death_noise3');
+		else if(num === 4)
+			var noise = game.add.audio('death_noise4');
+		else
+			var noise = game.add.audio('death_noise5');
+		noise.play();
+		var num = Math.floor(Math.random()*3);
+		if(num === 1)
+			var sound = game.add.audio('knife_cut1');
+		else if(num === 2)
+			var sound = game.add.audio('knife_cut2');
+		else
+			var sound = game.add.audio('knife_cut3');
+		sound.play();
+	}
 	obj.alive=false;
 	obj.body.velocity.x=0;
-	obj.body.velocity.y=0;	
+	obj.body.velocity.y=0;
+
 }
 function dodge(st){
 	
@@ -664,7 +694,11 @@ function startTimer()
 	timeElapsed=game.time.now - MenuDelayTime-p;
 	scoreText.text = 'Score: ' + score;
     timerText.text = 'Time Elapsed: 0:0' + Math.floor(Math.round(timeElapsed)/1000); //display the timer
-        
+    if (Math.floor(Math.round(timeElapsed)/1000) === 150)
+    {
+    	var tnoise = game.add.audio('timer_noise');
+    	noise.play();	
+    }
     if (Math.floor(Math.round(timeElapsed)/1000) >= 10) //making sure the seconds do not overflow
     {
         timerText.text = 'Time Elapsed: 0:' + Math.floor(Math.round(timeElapsed)/1000); 
@@ -701,14 +735,11 @@ function startTimer()
     		warningText.text = 'You win!';
 			game.add.image(0,0,'ending2');		
 			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Won!', 50 );		
+
     	}
-    	else{
-			game.add.image(0,0,'ending1');
-        	warningText.text = 'Game Over.';
-			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Lost', 50 );			
-			}
+    	else
+        	warningText.text = 'Game Over.'; 
         timerText.text = '';
-		
 		scoreFinal = game.add.bitmapText(530, 100, 'desyrel', 'Final Score: '+score, 50 );
 		stateText2=game.add.bitmapText(620,10,'desyrel','RESTART',35);		
 		stateText2.inputEnabled=true;
@@ -760,7 +791,7 @@ function spawnDishes()
 			//spawn timer... 5000 = 5 sec.
 			if(crunchtime===false)
 			{
-				dishTime = (game.time.now + 5000+Math.random()*4000)/*-aScore*/;
+				dishTime = (game.time.now + 7000)/*-aScore*/;
 			}
 			else{
 				dishTime = (game.time.now + 2000+Math.random()*4000)/*-aScore*/;
@@ -774,8 +805,16 @@ function collision (obj1, obj2)
 	atexst=obj1.name;
 	atexst2=obj2.name;
 	obj2.kill();
+	var num = Math.floor(Math.random()*3);
+	if(num === 1)
+		var pnoise = game.add.audio('plate_noise1');
+	else if(num === 2)
+		var pnoise = game.add.audio('plate_noise2');
+	else
+		var pnoise = game.add.audio('plate_noise3');
+	pnoise.play();
 	if(obj2.isRot===false)
-		{
+	{
 		if(obj1.i1)
 		{
 			if(obj2.name=== obj1.recipe[0])
@@ -813,7 +852,6 @@ function collision (obj1, obj2)
 				obj1.fin.children[j].visible = false;
 			}
 			obj1.reset(2000,800);*/
-			
 			obj1.finished = true;
 			compDishes++;
 		}
@@ -944,14 +982,14 @@ function resetDish2(dish)
 
 function createTomato()
 {
-	ranD = Math.floor(Math.random()*num1);
+	ranD = Math.floor(Math.random()*2);
 	if(ranD===1)
 	{
-		var aTomato = tomatoes.create(0,0,'tomatoRot');
-		aTomato.isRot=true;
-	}else{
 		var aTomato = tomatoes.create(0,0,'tomato');
 		aTomato.isRot=false;
+	}else{
+		var aTomato = tomatoes.create(0,0,'tomatoRot');
+		aTomato.isRot=true;
 	}
 	var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1032,14 +1070,14 @@ function resetTomato(item)
 function createWing()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*num1);
+	ranD = Math.floor(Math.random()*2);
 	if(ranD===1)
 	{
-		var aWing = wings.create(0,0,'wingRot');
-		aWing.isRot=true;
-	}else{
 		var aWing = wings.create(0,0,'wing');
 		aWing.isRot=false;
+	}else{
+		var aWing = wings.create(0,0,'wingRot');
+		aWing.isRot=true;
 	}
 	var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1121,14 +1159,14 @@ function resetWing(item)
 function createPepper()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*num1);
+	ranD = Math.floor(Math.random()*2);
 	if(ranD===1)
 	{
-		var aPepper = peppers.create(0,0,'pepperRot');
-		aPepper.isRot=true;
-	}else{
 		var aPepper = peppers.create(0,0,'pepper');
 		aPepper.isRot=false;
+	}else{
+		var aPepper = peppers.create(0,0,'pepperRot');
+		aPepper.isRot=true;
 	}
 	var right = aPepper.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aPepper.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1212,14 +1250,14 @@ function createSteak()
 {
 
 	//create the variable with the first dish sprite   
-	ranD = Math.floor(Math.random()*num1);
+	ranD = Math.floor(Math.random()*2);
 	if(ranD===1)
 	{
-		var aSteak = steaks.create(0, 0, 'steakRot');
-		aSteak.isRot=true;
-	}else{
-		var aSteak = steaks.create(0,0,'steak');
+		var aSteak = steaks.create(0, 0, 'steak');
 		aSteak.isRot=false;
+	}else{
+		var aSteak = steaks.create(0,0,'steakRot');
+		aSteak.isRot=true;
 	}	
 	var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1301,14 +1339,14 @@ function resetSteak(item)
 function createPotato()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*num1);
+	ranD = Math.floor(Math.random()*2);
 	if(ranD===1)
 	{
-		var aPotato = potatoes.create(0,0, 'potatoRot');
-		aPotato.isRot=true;
-	}else{
-		var aPotato = potatoes.create(0,0,'potato');
+		var aPotato = potatoes.create(0,0, 'potato');
 		aPotato.isRot=false;
+	}else{
+		var aPotato = potatoes.create(0,0,'potatoRot');
+		aPotato.isRot=true;
 	}
 	var right = aPotato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aPotato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1387,14 +1425,14 @@ function resetPotato(item)
 function createCelery()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*num1);
+	ranD = Math.floor(Math.random()*2);
 	if(ranD===1)
 	{
-		var aCelery = celeries.create(0, 0, 'celeryRot');
-		aCelery.isRot=true;
-	}else{
-		var aCelery = celeries.create(0,0,'celery');
+		var aCelery = celeries.create(0, 0, 'celery');
 		aCelery.isRot=false;
+	}else{
+		var aCelery = celeries.create(0,0,'celeryRot');
+		aCelery.isRot=true;
 	}
 	var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
 	var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 12, true);
@@ -1428,7 +1466,7 @@ function spawnCelery()
         if (celery)
         {
 			celery.alive=true;
-			y = Math.floor(Math.random()*150)+100;
+			y = Math.floor(Math.random()*150)+spawnY;
 			if(ranD===1)
 			{
 				//spawn the dishes offscreen so they can go and move into the screen
