@@ -584,7 +584,8 @@ function setDead(obj)
 	//{
 		obj.alive=false;
 		obj.body.velocity.x=0;
-		obj.body.velocity.y=0;	
+		obj.body.velocity.y=0;
+		if (obj.isRot==true){score-=50;}
 	//}
 }
 function dodge(st){
