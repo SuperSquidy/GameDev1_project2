@@ -11,6 +11,7 @@
 <script type="text/javascript"> 
 var game = new Phaser.Game(1334,750, Phaser.AUTO, '', 
 { preload: preload, create: create, update: update, render: render });
+var partical= new Array();
 
 /* TODO
 reset deadT when we drag
@@ -525,9 +526,34 @@ function update()
 		game.physics.arcade.overlap(wings, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(peppers, dishesG2.children[i], collision, null, this);
 	}
+	if(isDrag){
+		var d=game.add.sprite(game.input.x, game.input.y, 'plate1');
+		d.anchor.setTo(0.5, 0.5);
+		d.width=10;
+		d.height=10;
+    		partical.push(d);
+    		for (var i=0;i<partical.length;i++){
+    			partical[i].width=i;
+    		}
+    		if (partical.length>11){
+    	
+    			partical[0].kill();
+    			partical=partical.splice(1, partical.length-1);
+    	
+    	
+    		}
+	}
+    	if (!isDrag){
+    		for (var i=0;i<partical.length;i++){
+    			partical[i].kill();
+    		}
+    	
+    		partical=new Array();
+    	}
 
 }
 function isCutting(obj){
+	if (obj.isRot==true &&obj.alive){score-=50;}
 	if(game.input.x > obj.body.x && game.input.x < obj.body.right && game.input.y > obj.body.y && game.input.y < obj.body.bottom && isDrag){
 		obj.alive=false;
 		obj.body.velocity.x=0;
@@ -557,7 +583,8 @@ function setPause(obj)
 function setDead(obj)
 {
 	//if(isDrag)
-	//{
+	//{	
+		if (obj.isRot==true &&obj.alive){score-=50;}	
 		obj.alive=false;
 		obj.body.velocity.x=0;
 		obj.body.velocity.y=0;	
