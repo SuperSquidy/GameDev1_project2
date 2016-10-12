@@ -553,9 +553,12 @@ function update()
 }
 function isCutting(obj){
 	if(game.input.x > obj.body.x && game.input.x < obj.body.right && game.input.y > obj.body.y && game.input.y < obj.body.bottom && isDrag){
+		if (obj.isRot==true &&obj.alive){score-=50;}
 		obj.alive=false;
+
 		obj.body.velocity.x=0;
 		obj.body.velocity.y=0;
+
 	}
 }
 function resetTimer1(obj)
@@ -582,10 +585,11 @@ function setDead(obj)
 {
 	//if(isDrag)
 	//{
+		if (obj.isRot==true && obj.alive){score-=50;}
 		obj.alive=false;
 		obj.body.velocity.x=0;
 		obj.body.velocity.y=0;
-		if (obj.isRot==true){score-=50;}
+		
 	//}
 }
 function dodge(st){
