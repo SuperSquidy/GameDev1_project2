@@ -665,7 +665,11 @@ function startTimer()
     }
     if (Math.floor(Math.round(timeElapsed)/1000) >= 240) 
     {
-        warningText.text = 'Game Over.'; 
+    	if(score > 1500){
+    		warningText.text = 'You win!';
+    	}
+    	else
+        	warningText.text = 'Game Over.'; 
         timerText.text = '';
         canSpawn=false;
     }
