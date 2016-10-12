@@ -28,6 +28,7 @@ function preload(){
 	game.load.image('plate1', 'dish1plate.png');
 	game.load.image('ending1', 'BadEnding.png');
 	game.load.image('ending2', 'GoodEnding.png');
+	game.load.image('menuPic', 'menuPicture.png');
 	//sprite for dish2
     game.load.image('plate2', 'dish2plate.png');
     game.load.image('ticket', 'food/ticket.png');
@@ -71,6 +72,7 @@ var vidDone=false;
 var atexst;
 var atexst2;
 var skipText;
+var scoreFinal;
 var gmText;
 var text1;
 var text2;
@@ -129,6 +131,7 @@ var warningText;
 var video;
 var music;
 var sprite1;
+var sprite2;
 function create()
 {
 	game.add.image(0,0, 'background');
@@ -334,11 +337,13 @@ function beginGame()
 {
 	if(inMenuScreen)
 	{
+		
 		if(vidDone===false)
 		{
 			sprite1.destroy();
 			skipText.destroy();
 		}
+		sprite2 = game.add.image(0,0,'menuPicture');	
 		gameStartText.visible=false;//get rid of menu
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
@@ -348,6 +353,7 @@ function beginGame()
 }
 function update()
 {
+	if(inMenuScreen===false){sprite2.destroy();}
 	if(vidDone===false){video.onComplete.add(vidIsDone, this);}
 	// make a function that checks if the dishes are complete
 	if(canSpawn)
@@ -694,7 +700,7 @@ function startTimer()
     	if(score > 1500){
     		warningText.text = 'You win!';
 			game.add.image(0,0,'ending2');		
-			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Won!', 50 );	
+			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Won!', 50 );		
     	}
     	else{
 			game.add.image(0,0,'ending1');
@@ -702,6 +708,8 @@ function startTimer()
 			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Lost', 50 );			
 			}
         timerText.text = '';
+		
+		scoreFinal = game.add.bitmapText(530, 100, 'desyrel', 'Final Score: '+score, 50 );
 		stateText2=game.add.bitmapText(620,10,'desyrel','RESTART',35);		
 		stateText2.inputEnabled=true;
 		stateText2.events.onInputUp.add(function(){
