@@ -528,11 +528,6 @@ function update()
 }
 function isCutting(obj){
 	if(game.input.x > obj.body.x && game.input.x < obj.body.right && game.input.y > obj.body.y && game.input.y < obj.body.bottom && isDrag){
-		
-		if(obj.isRot===true&&obj.alive===true)
-		{
-			score-=50;
-		}
 		obj.alive=false;
 		obj.body.velocity.x=0;
 		obj.body.velocity.y=0;
@@ -560,13 +555,12 @@ function setPause(obj)
 }
 function setDead(obj)
 {
-	if(obj.isRot===true&&obj.alive===true)
-	{
-		score-=50;
-	}
-	obj.alive=false;
-	obj.body.velocity.x=0;
-	obj.body.velocity.y=0;	
+	//if(isDrag)
+	//{
+		obj.alive=false;
+		obj.body.velocity.x=0;
+		obj.body.velocity.y=0;	
+	//}
 }
 function dodge(st){
 	
@@ -903,7 +897,7 @@ function spawnTomato()
 				tomato.body.velocity.y = (Math.random()*100);
 			}
 			//spawn timer... 5000 = 5 sec.
-            tomatoTime = (game.time.now + Math.random()*10000);
+            tomatoTime = (game.time.now + Math.random()*7000);
         }
     }
 	
@@ -990,7 +984,7 @@ function spawnWing()
 				wing.body.velocity.y = (Math.random()*100);
 			}
 			//spawn timer... 5000 = 5 sec.
-            wingTime = (game.time.now + Math.random()*10000);
+            wingTime = (game.time.now + Math.random()*7000);
         }
     }
 	
@@ -1079,7 +1073,7 @@ function spawnPepper()
 				pepper.body.velocity.y = (Math.random()*100);
 			}
 			//spawn timer... 5000 = 5 sec.
-            pepperTime = (game.time.now + Math.random()*10000);
+            pepperTime = (game.time.now + Math.random()*7000);
         }
     }
 	
@@ -1168,7 +1162,7 @@ function spawnSteak()
 				steak.body.velocity.y = (Math.random()*100);
 			}
 			//spawn timer... 5000 = 5 sec.
-            steakTime = (game.time.now + Math.random()*10000);
+            steakTime = (game.time.now + Math.random()*7000);
         }
     }
 }
@@ -1252,7 +1246,7 @@ function spawnPotato()
 				potato.body.velocity.y = (Math.random()*100);
 			}
 			//spawn timer... 5000 = 5 sec.
-            potatoTime = (game.time.now + Math.random()*10000);
+            potatoTime = (game.time.now + Math.random()*7000);
         }
     }
 }
@@ -1339,7 +1333,7 @@ function spawnCelery()
 				celery.body.velocity.y = (Math.random()*100);
 			}
 			//spawn timer... 5000 = 5 sec.
-            celeryTime = (game.time.now + Math.random()*10000);
+            celeryTime = (game.time.now + Math.random()*7000);
         }
     }
 }
@@ -1349,6 +1343,7 @@ function resetCelery(item)
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
 	// and that is out of bounds
 	//add sound maybe if the player does not complete??
+	console.log("Celery created :D");
 	if(item.x>1354)
 	{
 		item.destroy();
