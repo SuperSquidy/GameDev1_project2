@@ -13,10 +13,6 @@ var game = new Phaser.Game(1334,750, Phaser.AUTO, '',
 { preload: preload, create: create, update: update, render: render });
 
 /* TODO
-reset deadT when we drag
-rotten food. add a variable to food now to see if its rotten or not
-Add items to points
-fixx celery!!!
 Add animation
 sound
 */
@@ -35,27 +31,27 @@ function preload(){
     game.load.image('tomato_dead', 'tomatoDead.png');
 	//sprite for steak
     game.load.spritesheet('steak', 'foodSteak_SpriteSheet.png',70,100);	
-    game.load.spritesheet('steakRot', 'RottenSteak_SpriteSheet.png',70,100);	//change
+    game.load.spritesheet('steakRot', 'RottenSteak_SpriteSheet.png',70,100);	
     game.load.image('steak2', 'foodSteak_static.png');
     game.load.image('steak_dead', 'steakDead.png');
 	//sprite for pepper
 	game.load.spritesheet('pepper', 'foodPepper_SpriteSheet.png',50,80);
-	game.load.spritesheet('pepperRot', 'RottenPepper_SpriteSheet.png',50,80);//change
+	game.load.spritesheet('pepperRot', 'RottenPepper_SpriteSheet.png',50,80);
     game.load.image('pepper2', 'foodPepper_static.png');
     game.load.image('pepper_dead', 'pepperDead.png');
 	//sprite for wing
     game.load.spritesheet('wing', 'foodWing_SpriteSheet.png',55,60);
-    game.load.spritesheet('wingRot', 'RottenWing_SpriteSheet.png',55,60);//change
+    game.load.spritesheet('wingRot', 'RottenWing_SpriteSheet.png',55,60);
     game.load.image('wing2', 'foodWing_static.png');
     game.load.image('wing_dead', 'wingDead.png');
 	//sprite for potato
-	game.load.spritesheet('potato', 'foodPotato_SpriteSheet.png',75,95);
-	game.load.spritesheet('potatoRot', 'RottenPotato_SpriteSheet.png',75,95);//change
+	game.load.spritesheet('potato', 'foodPotato_SpriteSheet.png',75,100);
+	game.load.spritesheet('potatoRot', 'RottenPotato_SpriteSheet.png',75,100);
     game.load.image('potato2', 'foodPotato_static.png');
     game.load.image('potato_dead', 'potatoDead.png');
 	//sprite for celery
-	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,180);
-	game.load.spritesheet('celeryRot', 'RottenCelery_SpriteSheet.png',90,180);//change
+	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,190);
+	game.load.spritesheet('celeryRot', 'RottenCelery_SpriteSheet.png',90,190);
     game.load.image('celery2', 'foodCelery_static.png');
     game.load.image('celery_dead', 'celeryDead.png');
 	//font
@@ -361,6 +357,7 @@ function update()
 		if(steaks.children[i].alive===false)
 		{
 			steaks.children[i].frame=16;
+			steaks.children[i].body.setSize(70, 45, 0, 30);
 			steaks.children[i].deadT++;
 			if(steaks.children[i].deadT>=300)
 			{
@@ -386,6 +383,7 @@ function update()
 		if(potatoes.children[i].alive===false)
 		{
 			potatoes.children[i].frame=16;
+			potatoes.children[i].body.setSize(77, 37, 0, 44);
 			potatoes.children[i].deadT++;
 			if(potatoes.children[i].deadT>=300)
 			{
@@ -412,6 +410,7 @@ function update()
 		{
 			celeries.children[i].frame=16;
 			celeries.children[i].deadT++;
+			celeries.children[i].body.setSize(94, 25, 0, 51);
 			if(celeries.children[i].deadT>=300)
 			{
 				celeries.children[i].body.x=4000;
@@ -437,6 +436,7 @@ function update()
 		if(tomatoes.children[i].alive===false)
 		{
 			tomatoes.children[i].frame=16;
+			tomatoes.children[i].body.setSize(70, 28, 0, 24);
 			tomatoes.children[i].deadT++;
 			if(tomatoes.children[i].deadT>=300)
 			{
@@ -461,6 +461,7 @@ function update()
 		if(peppers.children[i].alive===false)
 		{
 			peppers.children[i].frame=16;
+			peppers.children[i].body.setSize(30, 25, 9, 30);
 			peppers.children[i].deadT++;
 			if(peppers.children[i].deadT>=300)
 			{
@@ -485,6 +486,7 @@ function update()
 		if(wings.children[i].alive===false)
 		{
 			wings.children[i].frame=16;
+			wings.children[i].body.setSize(55, 34, 0, 15);
 			wings.children[i].deadT++;
 			if(wings.children[i].deadT>=300)
 			{
@@ -902,6 +904,8 @@ function spawnTomato()
 			}else{
 				tomato.body.velocity.y = (Math.random()*100);
 			}
+			
+			tomato.body.setSize(70, 70, 0, 0);
 			//spawn timer... 5000 = 5 sec.
             tomatoTime = (game.time.now + Math.random()*10000);
         }
@@ -989,6 +993,8 @@ function spawnWing()
 			}else{
 				wing.body.velocity.y = (Math.random()*100);
 			}
+			
+			wing.body.setSize(55, 60, 0, 0);
 			//spawn timer... 5000 = 5 sec.
             wingTime = (game.time.now + Math.random()*10000);
         }
@@ -1078,6 +1084,8 @@ function spawnPepper()
 			}else{
 				pepper.body.velocity.y = (Math.random()*100);
 			}
+			
+			pepper.body.setSize(50, 80, 0, 0);
 			//spawn timer... 5000 = 5 sec.
             pepperTime = (game.time.now + Math.random()*10000);
         }
@@ -1167,6 +1175,8 @@ function spawnSteak()
 			}else{
 				steak.body.velocity.y = (Math.random()*100);
 			}
+				
+			steak.body.setSize(70, 100, 0, 0);
 			//spawn timer... 5000 = 5 sec.
             steakTime = (game.time.now + Math.random()*10000);
         }
@@ -1251,6 +1261,7 @@ function spawnPotato()
 			}else{
 				potato.body.velocity.y = (Math.random()*100);
 			}
+			potato.body.setSize(75, 100, 0, 0);
 			//spawn timer... 5000 = 5 sec.
             potatoTime = (game.time.now + Math.random()*10000);
         }
@@ -1338,6 +1349,7 @@ function spawnCelery()
 			}else{
 				celery.body.velocity.y = (Math.random()*100);
 			}
+			celery.body.setSize(90, 190, 0, 0);
 			//spawn timer... 5000 = 5 sec.
             celeryTime = (game.time.now + Math.random()*10000);
         }
@@ -1364,18 +1376,31 @@ function resetCelery(item)
 
 function render() {
 
-   // game.debug.text('dish: '+atexst,32,62);
-   // game.debug.text('item: '+atexst2,422,62);
-   //game.debug.text('text: '+num1,32,82);
-   // game.debug.text('needs tomato '+text2,32,102);
-   // game.debug.text('needs steak '+text3,32,122);
-	
-	//game.debug.body(bottomCollider);
-	//game.debug.bodyInfo(topCollider,32,32);
-	//game.debug.bodyInfo(bottomCollider,32,32);
-	//game.debug.body(topCollider);
-//	game.debug.bodyInfo(topCollider,32,32);
-
+/*	for (var i = 0, len = peppers.children.length; i < len; i++){
+		
+		game.debug.body(peppers.children[i]);
+	}
+	for (var i = 0, len = tomatoes.children.length; i < len; i++){
+		
+		game.debug.body(tomatoes.children[i]);
+	}
+	for (var i = 0, len = wings.children.length; i < len; i++){
+		
+		game.debug.body(wings.children[i]);
+	}
+	for (var i = 0, len = steaks.children.length; i < len; i++){
+		
+		game.debug.body(steaks.children[i]);
+	}
+	for (var i = 0, len = celeries.children.length; i < len; i++){
+		
+		game.debug.body(celeries.children[i]);
+	}
+	for (var i = 0, len = potatoes.children.length; i < len; i++){
+		
+		game.debug.body(potatoes.children[i]);
+	}
+*/
 }
 
 </script>
