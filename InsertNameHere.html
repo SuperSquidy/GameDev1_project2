@@ -341,7 +341,33 @@ function update()
 	game.physics.arcade.collide(wings, topCollider);
 	game.physics.arcade.collide(wings, bottomCollider);
 	
-
+    game.physics.arcade.collide(steaks, steaks);
+    game.physics.arcade.collide(steaks, tomatoes);
+    game.physics.arcade.collide(steaks, potatoes);
+    game.physics.arcade.collide(steaks, celeries);
+    game.physics.arcade.collide(steaks, peppers);
+    game.physics.arcade.collide(steaks, wings);
+    
+    game.physics.arcade.collide(tomatoes, tomatoes);
+    game.physics.arcade.collide(tomatoes, potatoes);
+    game.physics.arcade.collide(tomatoes, celeries);
+    game.physics.arcade.collide(tomatoes, peppers);
+    game.physics.arcade.collide(tomatoes, wings);
+    
+    game.physics.arcade.collide(potatoes, potatoes);
+    game.physics.arcade.collide(potatoes, celeries);
+    game.physics.arcade.collide(potatoes, peppers);
+    game.physics.arcade.collide(potatoes, wings);
+    
+    game.physics.arcade.collide(celeries, celeries);
+    game.physics.arcade.collide(celeries, peppers);
+    game.physics.arcade.collide(celeries, wings);
+    
+    game.physics.arcade.collide(peppers, peppers);
+    game.physics.arcade.collide(peppers, wings);
+    
+    game.physics.arcade.collide(wings, wings);
+    
 	steaks.onChildInputOver.add(isCutting, this);
 	potatoes.onChildInputOver.add(isCutting, this);
 	tomatoes.onChildInputOver.add(isCutting, this);
