@@ -11,7 +11,7 @@
 <script type="text/javascript"> 
 var game = new Phaser.Game(1334,750, Phaser.AUTO, '', 
 { preload: preload, create: create, update: update, render: render });
-var partical= new Array();
+var particle = new Array();
 
 /* TODO
 Add animation
@@ -26,6 +26,8 @@ function preload(){
 	game.load.image ('background', 'Proj2_Background (1).png');
     //sprite for dish1
 	game.load.image('plate1', 'dish1plate.png');
+	game.load.image('ending1', 'BadEnding.png');
+	game.load.image('ending2', 'GoodEnding.png');
 	//sprite for dish2
     game.load.image('plate2', 'dish2plate.png');
     game.load.image('ticket', 'food/ticket.png');
@@ -66,6 +68,8 @@ function preload(){
 var vidDone=false;
 var atexst;
 var atexst2;
+var skipText;
+var gmText;
 var text1;
 var text2;
 var text3;
@@ -116,6 +120,7 @@ var h=600;
 var stop=true;
 var p=0;
 var stateText;
+var stateText2;
 var deadFood = [];
 //variable for 30 second warning
 var warningText;
@@ -128,8 +133,11 @@ function create()
 	video = game.add.video('video1');
 	video.play(false);    
 	sprite1 = video.addToWorld(0,0 );
+	skipText = game.add.bitmapText(530, 650, 'desyrel', 'Click to Skip!', 50 );
+	
 
 	stateText=game.add.bitmapText(600,10,'desyrel','',16);
+	stateText2=game.add.bitmapText(600,10,'desyrel','',16);
 	
 	//time elapsed
     timerText = game.add.bitmapText(10, 10, 'desyrel', '', 32);
@@ -305,6 +313,7 @@ function create()
 }
 function vidIsDone(){
 	vidDone=true;
+	skipText.destroy();
 	sprite1.destroy();
 }
 function setDragT()
@@ -320,6 +329,11 @@ function beginGame()
 {
 	if(inMenuScreen)
 	{
+		if(vidDone===false)
+		{
+			sprite1.destroy();
+			skipText.destroy();
+		}
 		gameStartText.visible=false;//get rid of menu
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
@@ -576,24 +590,24 @@ function update()
 		d.anchor.setTo(0.5, 0.5);
 		d.width=10;
 		d.height=10;
-    		partical.push(d);
-    		for (var i=0;i<partical.length;i++){
-    			partical[i].width=i;
+    		particle.push(d);
+    		for (var i=0;i<particle.length;i++){
+    			particle[i].width=i;
     		}
-    		if (partical.length>11){
+    		if (particle.length>11){
     	
-    			partical[0].kill();
-    			partical=partical.splice(1, partical.length-1);
+    			particle[0].kill();
+    			particle=particle.splice(1, particle.length-1);
     	
     	
     		}
 	}
     	if (!isDrag){
-    		for (var i=0;i<partical.length;i++){
-    			partical[i].kill();
+    		for (var i=0;i<particle.length;i++){
+    			particle[i].kill();
     		}
     	
-    		partical=new Array();
+    		particle =new Array();
     	}
 
 }
@@ -701,10 +715,19 @@ function startTimer()
     {
     	if(score > 1500){
     		warningText.text = 'You win!';
+			game.add.image(0,0,'ending2');
     	}
-    	else
+    	else{
+			game.add.image(0,0,'ending1');
         	warningText.text = 'Game Over.'; 
+			}
         timerText.text = '';
+		gmText = game.add.bitmapText(550, 50, 'desyrel', 'Game Over!', 50 );
+		stateText2=game.add.bitmapText(620,10,'desyrel','RESTART',35);		
+		stateText2.inputEnabled=true;
+		stateText2.events.onInputUp.add(function(){
+			window.location.reload(true);
+		});
         canSpawn=false;
     }
 
@@ -803,6 +826,7 @@ function collision (obj1, obj2)
 				obj1.fin.children[j].visible = false;
 			}
 			obj1.reset(2000,800);*/
+			
 			obj1.finished = true;
 			compDishes++;
 		}
@@ -1465,6 +1489,7 @@ function resetCelery(item)
 
 function render() {
 
+	//game.debug.text('text: '+vidDone,32,32);
 /*	for (var i = 0, len = peppers.children.length; i < len; i++){
 		
 		game.debug.body(peppers.children[i]);
