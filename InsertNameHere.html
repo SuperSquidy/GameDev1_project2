@@ -24,11 +24,11 @@ function preload(){
 	game.load.video('video1', 'food/opening/Take2c.mp4');
 	//background
 	game.load.image ('background', 'Proj2_Background (1).png');
+	game.load.image ('menuPicture', 'menuPicture.png');
     //sprite for dish1
 	game.load.image('plate1', 'dish1plate.png');
 	game.load.image('ending1', 'BadEnding.png');
 	game.load.image('ending2', 'GoodEnding.png');
-	game.load.image('menuPic', 'menuPicture.png');
 	//sprite for dish2
     game.load.image('plate2', 'dish2plate.png');
     game.load.image('ticket', 'food/ticket.png');
@@ -89,11 +89,11 @@ var vidDone=false;
 var atexst;
 var atexst2;
 var skipText;
-var scoreFinal;
 var gmText;
 var text1;
 var text2;
 var text3;
+var menuDone=false;
 var num1=0;
 var crunchtime=false;
 var spawnY=165;
@@ -119,12 +119,13 @@ var potatoTime=0;
 //delay time for celery;
 var celeryTime=0;
 //simple boolean used to start game
-var inMenuScreen = true;
+var inMenuScreen = false;
 //boolean that will activate once hasStarted = false;
 var canSpawn = false;
 //interger used for whish dish to spawn
 var ranD;
 //variable that will change once the game has started
+var gamsStarText;
 var gamsStarText;
 //var for keeping when user starts game
 var delayTime = 0;
@@ -147,16 +148,14 @@ var warningText;
 var video;
 var music;
 var sprite1;
-var sprite2;
 function create()
 {
 	game.add.image(0,0, 'background');
 	music = game.add.audio('bg_music');
-	gameStartText = game.add.text(game.world.centerX, 380, "Cut Fresh Food and Drag it to the appropriate dish \n Don't slice rotten food! \n Tap anywhere to start. ", { font: "40px Arial", fill: "#ffffff", align: "center" });
 	video = game.add.video('video1');
 	video.play(false);    
 	sprite1 = video.addToWorld(0,0 );
-
+	skipText=game.add.bitmapText(490,650,'desyrel','Click to Skip',60);
 	stateText=game.add.bitmapText(600,10,'desyrel','',16);
 	
 	//time elapsed
@@ -256,7 +255,6 @@ function create()
     }
 	//Menu
 	
-    gameStartText.anchor.setTo(.5, .5);
     stateText=game.add.bitmapText(600,10,'desyrel','',16);
 	game.input.onDown.add(beginGame, this);
     
@@ -334,6 +332,12 @@ function create()
 function vidIsDone(){
 	vidDone=true;
 	sprite1.destroy();
+	sprite2 = game.add.image(0,0,'menuPicture');
+	skipText.destroy();
+	if(menuDone===false)
+	{
+		inMenuScreen=true;
+	}
 }
 function setDragT()
 {
@@ -347,24 +351,28 @@ function setDragF()
 function beginGame()
 {
 	if(inMenuScreen)
-	{	
-		if(vidDone===false)
-		{
-			sprite1.destroy();
-			skipText.destroy();
-		}
-		sprite2 = game.add.image(0,0,'menuPicture');
-		gameStartText.visible=false;//get rid of menu
+	{		
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
 		MenuDelayTime = game.time.now; //keep track of when the user starts the game
 		pause_label.text='Pause';
+		sprite2.destroy();
+		menuDone=true;
+	}
+	
+	if(vidDone===false)
+	{
+		sprite1.destroy();
+		vidDone=true;
+		sprite2 = game.add.image(0,0,'menuPicture');
+		skipText.destroy();
+		inMenuScreen=true;
 	}
 }
 function update()
 {
-	if(inMenuScreen===false){sprite2.destroy();}
 	if(vidDone===false){video.onComplete.add(vidIsDone, this);}
+	if(menuDone){sprite2.destroy();}
 	// make a function that checks if the dishes are complete
 	if(canSpawn)
 	{
@@ -734,11 +742,13 @@ function startTimer()
     	if(score > 1500){
     		warningText.text = 'You win!';
 			game.add.image(0,0,'ending2');		
-			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Won!', 50 );		
-
+			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Won!', 50 );
     	}
-    	else
+    	else{
         	warningText.text = 'Game Over.'; 
+			game.add.image(0,0,'ending1');	
+			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Lose!', 50 );
+		}
         timerText.text = '';
 		scoreFinal = game.add.bitmapText(530, 100, 'desyrel', 'Final Score: '+score, 50 );
 		stateText2=game.add.bitmapText(620,10,'desyrel','RESTART',35);		
@@ -746,6 +756,7 @@ function startTimer()
 		stateText2.events.onInputUp.add(function(){
 			window.location.reload(true);
 		});
+		
         canSpawn=false;
     }
 
@@ -982,14 +993,14 @@ function resetDish2(dish)
 
 function createTomato()
 {
-	ranD = Math.floor(Math.random()*2);
+	ranD = Math.floor(Math.random()*5);
 	if(ranD===1)
 	{
-		var aTomato = tomatoes.create(0,0,'tomato');
-		aTomato.isRot=false;
-	}else{
 		var aTomato = tomatoes.create(0,0,'tomatoRot');
 		aTomato.isRot=true;
+	}else{
+		var aTomato = tomatoes.create(0,0,'tomato');
+		aTomato.isRot=false;
 	}
 	var right = aTomato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aTomato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1070,14 +1081,14 @@ function resetTomato(item)
 function createWing()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*2);
+	ranD = Math.floor(Math.random()*5);
 	if(ranD===1)
 	{
-		var aWing = wings.create(0,0,'wing');
-		aWing.isRot=false;
-	}else{
 		var aWing = wings.create(0,0,'wingRot');
 		aWing.isRot=true;
+	}else{
+		var aWing = wings.create(0,0,'wing');
+		aWing.isRot=false;
 	}
 	var right = aWing.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aWing.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1159,14 +1170,14 @@ function resetWing(item)
 function createPepper()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*2);
+	ranD = Math.floor(Math.random()*5);
 	if(ranD===1)
 	{
-		var aPepper = peppers.create(0,0,'pepper');
-		aPepper.isRot=false;
-	}else{
 		var aPepper = peppers.create(0,0,'pepperRot');
 		aPepper.isRot=true;
+	}else{
+		var aPepper = peppers.create(0,0,'pepper');
+		aPepper.isRot=false;
 	}
 	var right = aPepper.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aPepper.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1250,14 +1261,14 @@ function createSteak()
 {
 
 	//create the variable with the first dish sprite   
-	ranD = Math.floor(Math.random()*2);
+	ranD = Math.floor(Math.random()*5);
 	if(ranD===1)
 	{
-		var aSteak = steaks.create(0, 0, 'steak');
-		aSteak.isRot=false;
-	}else{
-		var aSteak = steaks.create(0,0,'steakRot');
+		var aSteak = steaks.create(0, 0, 'steakRot');
 		aSteak.isRot=true;
+	}else{
+		var aSteak = steaks.create(0,0,'steak');
+		aSteak.isRot=false;
 	}	
 	var right = aSteak.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aSteak.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1339,14 +1350,14 @@ function resetSteak(item)
 function createPotato()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*2);
+	ranD = Math.floor(Math.random()*5);
 	if(ranD===1)
 	{
-		var aPotato = potatoes.create(0,0, 'potato');
-		aPotato.isRot=false;
-	}else{
-		var aPotato = potatoes.create(0,0,'potatoRot');
+		var aPotato = potatoes.create(0,0, 'potatoRot');
 		aPotato.isRot=true;
+	}else{
+		var aPotato = potatoes.create(0,0,'potato');
+		aPotato.isRot=false;
 	}
 	var right = aPotato.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 15, true);
 	var left = aPotato.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 15, true);
@@ -1425,14 +1436,14 @@ function resetPotato(item)
 function createCelery()
 {
 	//create the variable with the first dish sprite
-	ranD = Math.floor(Math.random()*2);
+	ranD = Math.floor(Math.random()*5);
 	if(ranD===1)
 	{
-		var aCelery = celeries.create(0, 0, 'celery');
-		aCelery.isRot=false;
-	}else{
-		var aCelery = celeries.create(0,0,'celeryRot');
+		var aCelery = celeries.create(0, 0, 'celeryRot');
 		aCelery.isRot=true;
+	}else{
+		var aCelery = celeries.create(0,0,'celery');
+		aCelery.isRot=false;
 	}
 	var right = aCelery.animations.add('right', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
 	var left = aCelery.animations.add('left', [8, 9, 10, 11, 12, 13, 14, 15], 12, true);
