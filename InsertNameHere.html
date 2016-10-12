@@ -11,6 +11,7 @@
 <script type="text/javascript"> 
 var game = new Phaser.Game(1334,750, Phaser.AUTO, '', 
 { preload: preload, create: create, update: update, render: render });
+var partical= new Array();
 
 /* TODO
 Add animation
@@ -24,6 +25,7 @@ function preload(){
 	game.load.image('plate1', 'dish1plate.png');
 	//sprite for dish2
     game.load.image('plate2', 'dish2plate.png');
+    game.load.image('ticket', 'ticket.png');
 	//sprite for tomato
     game.load.spritesheet('tomato', 'foodTomato_SpriteSheet.png', 70,70);
     game.load.spritesheet('tomatoRot', 'RottenTomato_SpriteSheet.png', 70,70);
@@ -53,6 +55,7 @@ function preload(){
 	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,190);
 	game.load.spritesheet('celeryRot', 'RottenCelery_SpriteSheet.png',90,190);
     game.load.image('celery2', 'foodCelery_static.png');
+
     game.load.image('celery_dead', 'celeryDead.png');
 	//font
     game.load.bitmapFont('desyrel', 'desyrel.png', 'desyrel.xml');
@@ -242,7 +245,7 @@ function create()
         
 
         // And a label to 
-        choiseLabel = game.add.bitmapText(660, h-150, 'desyrel', '- Slice ingredients to kill them -\n- Drag them to the correct dish -\n- Beat the dinner rush in 4 mins! -', 50 );
+        choiseLabel = game.add.bitmapText(675, 300, 'desyrel', '- Slice ingredients to kill them -\n- Drag them to the correct dish -\n- Beat the dinner rush in 3 mins! -', 50 );
         choiseLabel.anchor.setTo(0.5, 0.5);
         
         
@@ -305,7 +308,7 @@ function beginGame()
 		gameStartText.visible=false;//get rid of menu
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
-		delayTime = game.time.now; //keep track of when the user starts the game
+		MenuDelayTime = game.time.now; //keep track of when the user starts the game
 		pause_label.text='Pause';
 	}
 }
@@ -336,7 +339,33 @@ function update()
 	game.physics.arcade.collide(wings, topCollider);
 	game.physics.arcade.collide(wings, bottomCollider);
 	
-
+    game.physics.arcade.collide(steaks, steaks);
+    game.physics.arcade.collide(steaks, tomatoes);
+    game.physics.arcade.collide(steaks, potatoes);
+    game.physics.arcade.collide(steaks, celeries);
+    game.physics.arcade.collide(steaks, peppers);
+    game.physics.arcade.collide(steaks, wings);
+    
+    game.physics.arcade.collide(tomatoes, tomatoes);
+    game.physics.arcade.collide(tomatoes, potatoes);
+    game.physics.arcade.collide(tomatoes, celeries);
+    game.physics.arcade.collide(tomatoes, peppers);
+    game.physics.arcade.collide(tomatoes, wings);
+    
+    game.physics.arcade.collide(potatoes, potatoes);
+    game.physics.arcade.collide(potatoes, celeries);
+    game.physics.arcade.collide(potatoes, peppers);
+    game.physics.arcade.collide(potatoes, wings);
+    
+    game.physics.arcade.collide(celeries, celeries);
+    game.physics.arcade.collide(celeries, peppers);
+    game.physics.arcade.collide(celeries, wings);
+    
+    game.physics.arcade.collide(peppers, peppers);
+    game.physics.arcade.collide(peppers, wings);
+    
+    game.physics.arcade.collide(wings, wings);
+    
 	steaks.onChildInputOver.add(isCutting, this);
 	potatoes.onChildInputOver.add(isCutting, this);
 	tomatoes.onChildInputOver.add(isCutting, this);
@@ -526,15 +555,36 @@ function update()
 		game.physics.arcade.overlap(wings, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(peppers, dishesG2.children[i], collision, null, this);
 	}
+	if(isDrag){
+		var d=game.add.sprite(game.input.x, game.input.y, 'plate1');
+		d.anchor.setTo(0.5, 0.5);
+		d.width=10;
+		d.height=10;
+    		partical.push(d);
+    		for (var i=0;i<partical.length;i++){
+    			partical[i].width=i;
+    		}
+    		if (partical.length>11){
+    	
+    			partical[0].kill();
+    			partical=partical.splice(1, partical.length-1);
+    	
+    	
+    		}
+	}
+    	if (!isDrag){
+    		for (var i=0;i<partical.length;i++){
+    			partical[i].kill();
+    		}
+    	
+    		partical=new Array();
+    	}
 
 }
 function isCutting(obj){
+	
 	if(game.input.x > obj.body.x && game.input.x < obj.body.right && game.input.y > obj.body.y && game.input.y < obj.body.bottom && isDrag){
-		
-		if(obj.isRot===true&&obj.alive===true)
-		{
-			score-=50;
-		}
+		if (obj.isRot==true &&obj.alive){score-=50;}
 		obj.alive=false;
 		obj.body.velocity.x=0;
 		obj.body.velocity.y=0;
@@ -562,10 +612,7 @@ function setPause(obj)
 }
 function setDead(obj)
 {
-	if(obj.isRot===true&&obj.alive===true)
-	{
-		score-=50;
-	}
+	if (obj.isRot==true &&obj.alive){score-=50;}	
 	obj.alive=false;
 	obj.body.velocity.x=0;
 	obj.body.velocity.y=0;	
@@ -624,29 +671,27 @@ function startTimer()
     {
         timerText.text = 'Time Elapsed: 2:' + (Math.floor(Math.round(timeElapsed)/1000) - 120); 
     }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 180)
+    if (Math.floor(Math.round(timeElapsed)/1000) >= 150)
     {
-        timerText.text = 'Time Elapsed: 3:0' + (Math.floor(Math.round(timeElapsed)/1000) - 180); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 190)
-    {
-        timerText.text = 'Time Elapsed: 3:' + (Math.floor(Math.round(timeElapsed)/1000) - 180); 
-    }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 210) //display a 30 second warning at the 3:30 mark
-    {
+        timerText.text = 'Time Elapsed: 2:' + (Math.floor(Math.round(timeElapsed)/1000) - 120); 
         warningText.text = '30 seconds left!'; 
 		crunchtime=true;
     }
-    if (Math.floor(Math.round(timeElapsed)/1000) > 213)
+    if (Math.floor(Math.round(timeElapsed)/1000) >= 153)
     {
-        warningText.text = ''; 
+        warningText.text = '';
     }
-    if (Math.floor(Math.round(timeElapsed)/1000) >= 240) 
+    if (Math.floor(Math.round(timeElapsed)/1000) >= 180) 
     {
-        warningText.text = 'Game Over.'; 
+    	if(score > 1500){
+    		warningText.text = 'You win!';
+    	}
+    	else
+        	warningText.text = 'Game Over.'; 
         timerText.text = '';
         canSpawn=false;
     }
+
 }
 function collisionHandler (obj1, obj2) {
 
@@ -671,8 +716,12 @@ function spawnDishes()
         {
 			//spawn the dishes offscreen so they can go and move into the screen
             dish.reset(-200, 520);
+            for(var j = 0; j < dish.ticket.children.length; j++){
+            	dish.ticket.children[j].reset(-200, 550);
+            	dish.ticket.children[j].body.velocity.x = 43 + compDishes * 2;
+            }
 			for(var j = 0; j < dish.ings.children.length; j++){
-            	dish.ings.children[j].reset(-210 + (j * 40), 560);
+            	dish.ings.children[j].reset(-120, 580 + (j * 40));
             	dish.ings.children[j].body.velocity.x = 43 + compDishes * 2;
             }
             for(var j = 0; j < dish.fin.children.length; j++){
@@ -765,6 +814,15 @@ function createDish1()
 	var icon = aDish.fin.create(0, 0, 'potato_dead');
 	var icon = aDish.fin.create(0, 0, 'tomato_dead');
 	var icon = aDish.fin.create(0, 0, 'steak_dead');
+
+	aDish.ticket = game.add.group();
+	aDish.ticket.enableBody = true;
+	aDish.ticket.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.ticket.create(-500, 0, 'ticket');
+	for(var j = 0; j < aDish.ticket.children[j].length; j++){
+		aDish.ticket.children[j].visible = false;
+	}
+
 	for(var j = 0; j < aDish.fin.children.length; j++){
 		aDish.fin.children[j].visible = false;
 	}	
@@ -777,6 +835,8 @@ function createDish1()
 	var icon = aDish.ings.create(0, 0, 'steak2');
 	for(var j = 0; j < aDish.ings.children.length; j++){
 		aDish.ings.children[j].visible = false;
+		aDish.ings.children[j].anchor.x = .5;
+		aDish.ings.children[j].anchor.y = .5;
 	}	
 	aDish.events.onOutOfBounds.add(resetDish1, this);
 }
@@ -809,9 +869,19 @@ function createDish2()
 		aDish.i2=true;
 		aDish.i3=true;
 		aDish.finished = false;
+
 		aDish.fin = game.add.group();
 		aDish.fin.enableBody = true;
 		aDish.fin.physicsBodyType = Phaser.Physics.ARCADE;
+
+		aDish.ticket = game.add.group();
+		aDish.ticket.enableBody = true;
+		aDish.ticket.physicsBodyType = Phaser.Physics.ARCADE;
+		var icon = aDish.ticket.create(-500, 0, 'ticket');
+		for(var j = 0; j < aDish.ticket.children[j].length; j++){
+			aDish.ticket.children[j].visible = false;
+		}
+
 		var icon = aDish.fin.create(0, 0, 'wing_dead');
 		var icon = aDish.fin.create(0, 0, 'pepper_dead');
 		var icon = aDish.fin.create(0, 0, 'celery_dead');
@@ -827,6 +897,8 @@ function createDish2()
     	var icon = aDish.ings.create(0, 0, 'celery2');
 		for(var j = 0; j < aDish.ings.children.length; j++){
     		aDish.ings.children[j].visible = false;
+    		aDish.ings.children[j].anchor.x = .5;
+			aDish.ings.children[j].anchor.y = .5;
     	}	
         aDish.events.onOutOfBounds.add(resetDish2, this);
 }
@@ -907,7 +979,7 @@ function spawnTomato()
 			
 			tomato.body.setSize(70, 70, 0, 0);
 			//spawn timer... 5000 = 5 sec.
-            tomatoTime = (game.time.now + Math.random()*10000);
+            tomatoTime = (game.time.now + Math.random()*7000);
         }
     }
 	
@@ -996,7 +1068,7 @@ function spawnWing()
 			
 			wing.body.setSize(55, 60, 0, 0);
 			//spawn timer... 5000 = 5 sec.
-            wingTime = (game.time.now + Math.random()*10000);
+            wingTime = (game.time.now + Math.random()*7000);
         }
     }
 	
@@ -1087,7 +1159,7 @@ function spawnPepper()
 			
 			pepper.body.setSize(50, 80, 0, 0);
 			//spawn timer... 5000 = 5 sec.
-            pepperTime = (game.time.now + Math.random()*10000);
+            pepperTime = (game.time.now + Math.random()*7000);
         }
     }
 	
@@ -1178,7 +1250,7 @@ function spawnSteak()
 				
 			steak.body.setSize(70, 100, 0, 0);
 			//spawn timer... 5000 = 5 sec.
-            steakTime = (game.time.now + Math.random()*10000);
+            steakTime = (game.time.now + Math.random()*7000);
         }
     }
 }
@@ -1263,7 +1335,7 @@ function spawnPotato()
 			}
 			potato.body.setSize(75, 100, 0, 0);
 			//spawn timer... 5000 = 5 sec.
-            potatoTime = (game.time.now + Math.random()*10000);
+            potatoTime = (game.time.now + Math.random()*7000);
         }
     }
 }
@@ -1351,7 +1423,7 @@ function spawnCelery()
 			}
 			celery.body.setSize(90, 190, 0, 0);
 			//spawn timer... 5000 = 5 sec.
-            celeryTime = (game.time.now + Math.random()*10000);
+            celeryTime = (game.time.now + Math.random()*7000);
         }
     }
 }
@@ -1361,6 +1433,7 @@ function resetCelery(item)
 	//picked 200 so that when it spawns it does not kill because tomatoe sprite could go to spawns at x=-200 and x = 1534
 	// and that is out of bounds
 	//add sound maybe if the player does not complete??
+	console.log("Celery created :D");
 	if(item.x>1354)
 	{
 		item.destroy();
