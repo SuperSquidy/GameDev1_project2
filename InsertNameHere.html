@@ -11,7 +11,6 @@
 <script type="text/javascript"> 
 var game = new Phaser.Game(1334,750, Phaser.AUTO, '', 
 { preload: preload, create: create, update: update, render: render });
-var partical= new Array();
 
 /* TODO
 reset deadT when we drag
@@ -29,35 +28,36 @@ function preload(){
 	game.load.image('plate1', 'dish1plate.png');
 	//sprite for dish2
     game.load.image('plate2', 'dish2plate.png');
+    game.load.image('ticket', 'ticket.png');
 	//sprite for tomato
     game.load.spritesheet('tomato', 'foodTomato_SpriteSheet.png', 70,70);
     game.load.spritesheet('tomatoRot', 'RottenTomato_SpriteSheet.png', 70,70);
-    game.load.image('tomato2', 'foodTomato_static.png');
+    game.load.image('tomato2', 'tomatoDead.png');
     game.load.image('tomato_dead', 'tomatoDead.png');
 	//sprite for steak
     game.load.spritesheet('steak', 'foodSteak_SpriteSheet.png',70,100);	
     game.load.spritesheet('steakRot', 'RottenSteak_SpriteSheet.png',70,100);	//change
-    game.load.image('steak2', 'foodSteak_static.png');
+    game.load.image('steak2', 'steakDead.png');
     game.load.image('steak_dead', 'steakDead.png');
 	//sprite for pepper
 	game.load.spritesheet('pepper', 'foodPepper_SpriteSheet.png',50,80);
 	game.load.spritesheet('pepperRot', 'RottenPepper_SpriteSheet.png',50,80);//change
-    game.load.image('pepper2', 'foodPepper_static.png');
+    game.load.image('pepper2', 'pepperDead.png');
     game.load.image('pepper_dead', 'pepperDead.png');
 	//sprite for wing
     game.load.spritesheet('wing', 'foodWing_SpriteSheet.png',55,60);
     game.load.spritesheet('wingRot', 'RottenWing_SpriteSheet.png',55,60);//change
-    game.load.image('wing2', 'foodWing_static.png');
+    game.load.image('wing2', 'wingDead.png');
     game.load.image('wing_dead', 'wingDead.png');
 	//sprite for potato
 	game.load.spritesheet('potato', 'foodPotato_SpriteSheet.png',75,95);
 	game.load.spritesheet('potatoRot', 'RottenPotato_SpriteSheet.png',75,95);//change
-    game.load.image('potato2', 'foodPotato_static.png');
+    game.load.image('potato2', 'potatoDead.png');
     game.load.image('potato_dead', 'potatoDead.png');
 	//sprite for celery
 	game.load.spritesheet('celery', 'foodCelery_SpriteSheet.png',90,180);
 	game.load.spritesheet('celeryRot', 'RottenCelery_SpriteSheet.png',90,180);//change
-    game.load.image('celery2', 'foodCelery_static.png');
+    game.load.image('celery2', 'celeryDead.png');
     game.load.image('celery_dead', 'celeryDead.png');
 	//font
     game.load.bitmapFont('desyrel', 'desyrel.png', 'desyrel.xml');
@@ -247,7 +247,7 @@ function create()
         
 
         // And a label to 
-        choiseLabel = game.add.bitmapText(675, 300, 'desyrel', '- Slice ingredients to kill them -\n- Drag them to the correct dish -\n- Beat the dinner rush in 4 mins! -', 50 );
+        choiseLabel = game.add.bitmapText(660, h-150, 'desyrel', '- Slice ingredients to kill them -\n- Drag them to the correct dish -\n- Beat the dinner rush in 4 mins! -', 50 );
         choiseLabel.anchor.setTo(0.5, 0.5);
         
         
@@ -310,7 +310,7 @@ function beginGame()
 		gameStartText.visible=false;//get rid of menu
 		canSpawn=true;//set it so the veggies can spawn
 		inMenuScreen = false;
-		MenuDelayTime = game.time.now; //keep track of when the user starts the game
+		delayTime = game.time.now; //keep track of when the user starts the game
 		pause_label.text='Pause';
 	}
 }
@@ -525,40 +525,13 @@ function update()
 		game.physics.arcade.overlap(wings, dishesG2.children[i], collision, null, this);
 		game.physics.arcade.overlap(peppers, dishesG2.children[i], collision, null, this);
 	}
-	if(isDrag){
-		var d=game.add.sprite(game.input.x, game.input.y, 'plate1');
-		d.anchor.setTo(0.5, 0.5);
-		d.width=10;
-		d.height=10;
-    		partical.push(d);
-    		for (var i=0;i<partical.length;i++){
-    			partical[i].width=i;
-    		}
-    		if (partical.length>11){
-    	
-    			partical[0].kill();
-    			partical=partical.splice(1, partical.length-1);
-    	
-    	
-    		}
-	}
-    	if (!isDrag){
-    		for (var i=0;i<partical.length;i++){
-    			partical[i].kill();
-    		}
-    	
-    		partical=new Array();
-    	}
 
 }
 function isCutting(obj){
 	if(game.input.x > obj.body.x && game.input.x < obj.body.right && game.input.y > obj.body.y && game.input.y < obj.body.bottom && isDrag){
-		if (obj.isRot==true &&obj.alive){score-=50;}
 		obj.alive=false;
-
 		obj.body.velocity.x=0;
 		obj.body.velocity.y=0;
-
 	}
 }
 function resetTimer1(obj)
@@ -585,11 +558,9 @@ function setDead(obj)
 {
 	//if(isDrag)
 	//{
-		if (obj.isRot==true && obj.alive){score-=50;}
 		obj.alive=false;
 		obj.body.velocity.x=0;
-		obj.body.velocity.y=0;
-		
+		obj.body.velocity.y=0;	
 	//}
 }
 function dodge(st){
@@ -697,8 +668,12 @@ function spawnDishes()
         {
 			//spawn the dishes offscreen so they can go and move into the screen
             dish.reset(-200, 520);
+            for(var j = 0; j < dish.ticket.children.length; j++){
+            	dish.ticket.children[j].reset(-200, 550);
+            	dish.ticket.children[j].body.velocity.x = 43 + compDishes * 2;
+            }
 			for(var j = 0; j < dish.ings.children.length; j++){
-            	dish.ings.children[j].reset(-210 + (j * 40), 560);
+            	dish.ings.children[j].reset(-120, 580 + (j * 40));
             	dish.ings.children[j].body.velocity.x = 43 + compDishes * 2;
             }
             for(var j = 0; j < dish.fin.children.length; j++){
@@ -791,6 +766,15 @@ function createDish1()
 	var icon = aDish.fin.create(0, 0, 'potato_dead');
 	var icon = aDish.fin.create(0, 0, 'tomato_dead');
 	var icon = aDish.fin.create(0, 0, 'steak_dead');
+
+	aDish.ticket = game.add.group();
+	aDish.ticket.enableBody = true;
+	aDish.ticket.physicsBodyType = Phaser.Physics.ARCADE;
+	var icon = aDish.ticket.create(-500, 0, 'ticket');
+	for(var j = 0; j < aDish.ticket.children[j].length; j++){
+		aDish.ticket.children[j].visible = false;
+	}
+
 	for(var j = 0; j < aDish.fin.children.length; j++){
 		aDish.fin.children[j].visible = false;
 	}	
@@ -803,6 +787,8 @@ function createDish1()
 	var icon = aDish.ings.create(0, 0, 'steak2');
 	for(var j = 0; j < aDish.ings.children.length; j++){
 		aDish.ings.children[j].visible = false;
+		aDish.ings.children[j].anchor.x = .5;
+		aDish.ings.children[j].anchor.y = .5;
 	}	
 	aDish.events.onOutOfBounds.add(resetDish1, this);
 }
@@ -835,9 +821,19 @@ function createDish2()
 		aDish.i2=true;
 		aDish.i3=true;
 		aDish.finished = false;
+
 		aDish.fin = game.add.group();
 		aDish.fin.enableBody = true;
 		aDish.fin.physicsBodyType = Phaser.Physics.ARCADE;
+
+		aDish.ticket = game.add.group();
+		aDish.ticket.enableBody = true;
+		aDish.ticket.physicsBodyType = Phaser.Physics.ARCADE;
+		var icon = aDish.ticket.create(-500, 0, 'ticket');
+		for(var j = 0; j < aDish.ticket.children[j].length; j++){
+			aDish.ticket.children[j].visible = false;
+		}
+
 		var icon = aDish.fin.create(0, 0, 'wing_dead');
 		var icon = aDish.fin.create(0, 0, 'pepper_dead');
 		var icon = aDish.fin.create(0, 0, 'celery_dead');
@@ -853,6 +849,8 @@ function createDish2()
     	var icon = aDish.ings.create(0, 0, 'celery2');
 		for(var j = 0; j < aDish.ings.children.length; j++){
     		aDish.ings.children[j].visible = false;
+    		aDish.ings.children[j].anchor.x = .5;
+			aDish.ings.children[j].anchor.y = .5;
     	}	
         aDish.events.onOutOfBounds.add(resetDish2, this);
 }
