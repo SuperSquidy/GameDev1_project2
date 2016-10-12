@@ -11,7 +11,7 @@
 <script type="text/javascript"> 
 var game = new Phaser.Game(1334,750, Phaser.AUTO, '', 
 { preload: preload, create: create, update: update, render: render });
-var partical= new Array();
+var particle = new Array();
 
 /* TODO
 Add animation
@@ -576,24 +576,24 @@ function update()
 		d.anchor.setTo(0.5, 0.5);
 		d.width=10;
 		d.height=10;
-    		partical.push(d);
-    		for (var i=0;i<partical.length;i++){
-    			partical[i].width=i;
+    		particle.push(d);
+    		for (var i=0;i<particle.length;i++){
+    			particle[i].width=i;
     		}
-    		if (partical.length>11){
+    		if (particle.length>11){
     	
-    			partical[0].kill();
-    			partical=partical.splice(1, partical.length-1);
+    			particle[0].kill();
+    			particle=particle.splice(1, particle.length-1);
     	
     	
     		}
 	}
     	if (!isDrag){
-    		for (var i=0;i<partical.length;i++){
-    			partical[i].kill();
+    		for (var i=0;i<particle.length;i++){
+    			particle[i].kill();
     		}
     	
-    		partical=new Array();
+    		particle =new Array();
     	}
 
 }
@@ -1465,7 +1465,7 @@ function resetCelery(item)
 
 function render() {
 
-	game.debug.text('text: '+vidDone,32,32);
+	//game.debug.text('text: '+vidDone,32,32);
 /*	for (var i = 0, len = peppers.children.length; i < len; i++){
 		
 		game.debug.body(peppers.children[i]);
