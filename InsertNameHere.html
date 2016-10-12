@@ -705,7 +705,7 @@ function startTimer()
     if (Math.floor(Math.round(timeElapsed)/1000) === 150)
     {
     	var tnoise = game.add.audio('timer_noise');
-    	noise.play();	
+    	tnoise.play();	
     }
     if (Math.floor(Math.round(timeElapsed)/1000) >= 10) //making sure the seconds do not overflow
     {
