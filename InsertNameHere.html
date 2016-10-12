@@ -693,14 +693,15 @@ function startTimer()
     {
     	if(score > 1500){
     		warningText.text = 'You win!';
-			game.add.image(0,0,'ending2');
+			game.add.image(0,0,'ending2');		
+			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Won!', 50 );	
     	}
     	else{
 			game.add.image(0,0,'ending1');
-        	warningText.text = 'Game Over.'; 
+        	warningText.text = 'Game Over.';
+			gmText = game.add.bitmapText(450, 50, 'desyrel', 'Game Over! You Lost', 50 );			
 			}
         timerText.text = '';
-		gmText = game.add.bitmapText(550, 50, 'desyrel', 'Game Over!', 50 );
 		stateText2=game.add.bitmapText(620,10,'desyrel','RESTART',35);		
 		stateText2.inputEnabled=true;
 		stateText2.events.onInputUp.add(function(){
